@@ -16,7 +16,7 @@ public class MapGenerator : MonoBehaviour
     public int RandomFillPercentage = 50;
     [Min(0)]
     public int BorderThickness = 1;
-    [Min(0)]
+    [Range(0,10)]
     public int SmoothingCount = 1;
     public string Seed;
     public bool UseRandomSeed = true;
@@ -43,7 +43,10 @@ public class MapGenerator : MonoBehaviour
     {
         cave = new bool[Width, Height];
         RandomFillMap();
-        SmoothMap(SmoothingCount);
+        for (int i = 0; i < SmoothingCount; i++)
+        {
+            SmoothMap();
+        }
         Generate2DMesh();
     }
 
@@ -65,11 +68,6 @@ public class MapGenerator : MonoBehaviour
                 }
             }
         }
-    }
-
-    private void SmoothMap(int count)
-    {
-
     }
 
     private void Generate2DMesh()
@@ -96,5 +94,39 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    void SmoothMap()
+    {
+        for (int x = BorderThickness; x < cave.GetLength(0) - BorderThickness; x++)
+        {
+            for (int y = BorderThickness; y < cave.GetLength(1) - BorderThickness; y++)
+            {
+                int neighbourWallTiles = GetSurroundingWallCount(x, y);
 
+                if (neighbourWallTiles > 4)
+                {
+                    cave[x, y] = true;
+                }
+                else if (neighbourWallTiles < 4)
+                {
+                    cave[x, y] = false;
+                }
+            }
+        }
+    }
+
+   int GetSurroundingWallCount(int gridX, int gridY)
+    {        
+        int wallCount = 0;
+        for (int neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++)
+        {
+            for (int neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++)
+            {
+                if (neighbourX != gridX || neighbourY != gridY)
+                {
+                    wallCount += cave[neighbourX, neighbourY] ? 1 : 0;                    
+                }
+            }
+        }
+        return wallCount;
+    }
 }

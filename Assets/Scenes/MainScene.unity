@@ -307,10 +307,10 @@ MonoBehaviour:
   Height: 72
   RandomFillPercentage: 50
   BorderThickness: 1
-  SmoothingCount: 1
-  Seed: 
-  UseRandomSeed: 1
-  DrawGizmos: 0
+  SmoothingCount: 0
+  Seed: jsuv
+  UseRandomSeed: 0
+  DrawGizmos: 1
 --- !u!4 &2121411494
 Transform:
   m_ObjectHideFlags: 0
