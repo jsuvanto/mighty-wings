@@ -7,7 +7,7 @@ using UnityEngine;
 public class MapGenerator : MonoBehaviour
 {
 
-    private bool[,] cave;
+    private CaveTile[,] cave;
     
     public uint Width = 128;
     public uint Height = 72;
@@ -18,32 +18,41 @@ public class MapGenerator : MonoBehaviour
     public uint SmoothingCount = 1;
     public string Seed;
     public bool UseRandomSeed = true;
+
+    public uint MinimumFeatureSize;
+
+    public bool RemoveSmallFeatures;
     
     public bool DrawGizmos = true;
 
     void Start()
     {
-        GenerateMap();
+        GenerateCave();
     }
 
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            GenerateMap();
+            GenerateCave();
         }
     }
 
-    private void GenerateMap()
+    private void GenerateCave()
     {
-        cave = new bool[Width, Height];
+        cave = new CaveTile[Width, Height];
         RandomFillMap();
         for (int i = 0; i < SmoothingCount; i++)
         {
-            SmoothMap();
+            SmoothCave();
         }
+
+        if (!RemoveSmallFeatures) RemoveFeatures();
+
         Generate2DMesh();
     }
+
+
 
     private void RandomFillMap()
     {       
@@ -55,14 +64,43 @@ public class MapGenerator : MonoBehaviour
             {
                 if (x < BorderThickness || x > cave.GetLength(0) - BorderThickness - 1 || y < BorderThickness || y > cave.GetLength(1) - BorderThickness - 1)
                 {
-                    cave[x, y] = true;
+                    cave[x, y] = CaveTile.Wall;
                 }
                 else
                 {
-                    cave[x, y] = random.Next(0, 100) < RandomFillPercentage ? true : false;
+                    cave[x, y] = random.Next(0, 100) < RandomFillPercentage ? CaveTile.Wall : CaveTile.Air;
                 }
             }
         }
+    }
+
+    private void SmoothCave()
+    {
+        var smoothCave = cave;
+
+        for (uint x = BorderThickness; x < cave.GetLength(0) - BorderThickness; x++)
+        {
+            for (uint y = BorderThickness; y < cave.GetLength(1) - BorderThickness; y++)
+            {
+                uint neighbourWallTiles = GetSurroundingWallCount(x, y);
+
+                if (neighbourWallTiles > 4)
+                {
+                    smoothCave[x, y] = CaveTile.Wall;
+                }
+                else if (neighbourWallTiles < 4)
+                {
+                    smoothCave[x, y] = CaveTile.Air;
+                }
+            }
+        }
+
+        cave = smoothCave;
+    }
+
+    private void RemoveFeatures()
+    {
+        
     }
 
     private void Generate2DMesh()
@@ -81,29 +119,20 @@ public class MapGenerator : MonoBehaviour
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    Gizmos.color = cave[x, y] ? Color.black : Color.white;
+                    switch (cave[x,y])
+                    {
+                        case CaveTile.Wall:
+                            Gizmos.color = Color.black;
+                            break;
+                        case CaveTile.Air:
+                            Gizmos.color = Color.white;
+                            break;
+                        default:
+                            Gizmos.color = Color.clear;
+                            break;
+                    }
                     Vector2 pos = new Vector2(-Width / 2 + x + .5f, -Height / 2 + y + .5f);
                     Gizmos.DrawCube(pos, Vector3.one);
-                }
-            }
-        }
-    }
-
-    private void SmoothMap()
-    {
-        for (uint x = BorderThickness; x < cave.GetLength(0) - BorderThickness; x++)
-        {
-            for (uint y = BorderThickness; y < cave.GetLength(1) - BorderThickness; y++)
-            {
-                uint neighbourWallTiles = GetSurroundingWallCount(x, y);
-
-                if (neighbourWallTiles > 4)
-                {
-                    cave[x, y] = true;
-                }
-                else if (neighbourWallTiles < 4)
-                {
-                    cave[x, y] = false;
                 }
             }
         }
@@ -118,10 +147,15 @@ public class MapGenerator : MonoBehaviour
             {
                 if (neighbourX != gridX || neighbourY != gridY)
                 {
-                    wallCount += (uint) (cave[neighbourX, neighbourY] ? 1 : 0);
+                    wallCount += (uint) (cave[neighbourX, neighbourY] == CaveTile.Wall ? 1 : 0);
                 }
             }
         }
         return wallCount;
     }
+}
+
+public enum CaveTile
+{
+    Wall, Air
 }

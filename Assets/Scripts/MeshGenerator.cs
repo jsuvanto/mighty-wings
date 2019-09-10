@@ -10,7 +10,7 @@ public class MeshGenerator : MonoBehaviour
 
     public bool Generate;
 
-    public void GenerateMesh(bool[,] caveMap, float squareSize)
+    public void GenerateMesh(CaveTile[,] caveMap, float squareSize)
     {
 
         if (!Generate) return;
@@ -135,7 +135,7 @@ public class MeshGenerator : MonoBehaviour
     {
         public Square[,] squares;
 
-        public SquareGrid(bool[,] caveMap, float squareSize)
+        public SquareGrid(CaveTile[,] caveMap, float squareSize)
         {
             int nodeCountX = caveMap.GetLength(0);
             int nodeCountY = caveMap.GetLength(1);
@@ -161,7 +161,6 @@ public class MeshGenerator : MonoBehaviour
                     squares[x, y] = new Square(controlNodes[x, y + 1], controlNodes[x + 1, y + 1], controlNodes[x + 1, y], controlNodes[x, y]);
                 }
             }
-
         }
     }
 
@@ -184,13 +183,13 @@ public class MeshGenerator : MonoBehaviour
             centreBottom = bottomLeft.right;
             centreLeft = bottomLeft.above;
 
-            if (topLeft.active)
+            if (topLeft.caveTile == CaveTile.Wall)
                 configuration += 8;
-            if (topRight.active)
+            if (topRight.caveTile == CaveTile.Wall)
                 configuration += 4;
-            if (bottomRight.active)
+            if (bottomRight.caveTile == CaveTile.Wall)
                 configuration += 2;
-            if (bottomLeft.active)
+            if (bottomLeft.caveTile == CaveTile.Wall)
                 configuration += 1;
         }
     }
@@ -208,13 +207,12 @@ public class MeshGenerator : MonoBehaviour
 
     public class ControlNode : Node
     {
-
-        public bool active;
+        public CaveTile caveTile;
         public Node above, right;
 
-        public ControlNode(Vector3 _pos, bool _active, float squareSize) : base(_pos)
+        public ControlNode(Vector2 _pos, CaveTile _caveTile, float squareSize) : base(_pos)
         {
-            active = _active;
+            caveTile = _caveTile;
             above = new Node(position + Vector2.up * squareSize / 2f);
             right = new Node(position + Vector2.right * squareSize / 2f);
         }
