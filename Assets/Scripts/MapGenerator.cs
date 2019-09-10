@@ -7,30 +7,24 @@ public class MapGenerator : MonoBehaviour
 {
 
     private bool[,] cave;
-
-    [Min(0)]
-    public int Width = 128;
-    [Min(0)]
-    public int Height = 72;
+    
+    public uint Width = 128;
+    public uint Height = 72;
     [Range(0,100)]
-    public int RandomFillPercentage = 50;
-    [Min(0)]
-    public int BorderThickness = 1;
+    public uint RandomFillPercentage = 50;
+    public uint BorderThickness = 1;
     [Range(0,10)]
-    public int SmoothingCount = 1;
+    public uint SmoothingCount = 1;
     public string Seed;
     public bool UseRandomSeed = true;
-
-    // debugging
+    
     public bool DrawGizmos = true;
 
-    // Start is called before the first frame update
     void Start()
     {
         GenerateMap();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -64,7 +58,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else
                 {
-                    cave[x, y] = random.Next(0, 100) >= RandomFillPercentage ? true : false;
+                    cave[x, y] = random.Next(0, 100) < RandomFillPercentage ? true : false;
                 }
             }
         }
@@ -94,13 +88,13 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    void SmoothMap()
+    private void SmoothMap()
     {
-        for (int x = BorderThickness; x < cave.GetLength(0) - BorderThickness; x++)
+        for (uint x = BorderThickness; x < cave.GetLength(0) - BorderThickness; x++)
         {
-            for (int y = BorderThickness; y < cave.GetLength(1) - BorderThickness; y++)
+            for (uint y = BorderThickness; y < cave.GetLength(1) - BorderThickness; y++)
             {
-                int neighbourWallTiles = GetSurroundingWallCount(x, y);
+                uint neighbourWallTiles = GetSurroundingWallCount(x, y);
 
                 if (neighbourWallTiles > 4)
                 {
@@ -114,16 +108,16 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-   int GetSurroundingWallCount(int gridX, int gridY)
+    private uint GetSurroundingWallCount(uint gridX, uint gridY)
     {        
-        int wallCount = 0;
-        for (int neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++)
+        uint wallCount = 0;
+        for (uint neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++)
         {
-            for (int neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++)
+            for (uint neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++)
             {
                 if (neighbourX != gridX || neighbourY != gridY)
                 {
-                    wallCount += cave[neighbourX, neighbourY] ? 1 : 0;                    
+                    wallCount += (uint) (cave[neighbourX, neighbourY] ? 1 : 0);
                 }
             }
         }
