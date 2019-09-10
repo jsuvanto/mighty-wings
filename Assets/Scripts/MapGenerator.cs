@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(MeshGenerator))]
 public class MapGenerator : MonoBehaviour
 {
 
