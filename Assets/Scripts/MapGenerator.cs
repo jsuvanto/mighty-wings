@@ -19,9 +19,11 @@ public class MapGenerator : MonoBehaviour
     public string Seed;
     public bool UseRandomSeed = true;
 
-    public uint MinimumFeatureSize;
+    public uint MinimumRegionSize;
 
-    public bool RemoveSmallFeatures;
+    public bool RemoveSmallRegions;
+    public uint PassageWidth;
+    public bool ConnectAllRooms;
     
     public bool DrawGizmos = true;
 
@@ -47,22 +49,32 @@ public class MapGenerator : MonoBehaviour
             SmoothCave();
         }
 
-        if (!RemoveSmallFeatures) RemoveFeatures();
+        if (RemoveSmallRegions) RemoveSmallRegionsOfTypes(CaveTile.Air, CaveTile.Wall);
+
+        if (ConnectAllRooms) ConnectAllRegionsOfType(CaveTile.Air);
 
         Generate2DMesh();
     }
 
-
+    private void ConnectAllRegionsOfType(CaveTile type) // TODO crash inbound
+    {
+        var regions = GetRegions(type);
+        while (regions.Count > 1) // TODO: this is recursive (nice) but wasteful (not nice)
+        {
+            ConnectFirstRegion(regions);
+            regions = GetRegions(type);
+        }
+    }
 
     private void RandomFillMap()
     {       
         System.Random random = new System.Random(UseRandomSeed ? (int) DateTimeOffset.Now.ToUnixTimeSeconds() : Seed.GetHashCode());
 
-        for (int x = 0; x < cave.GetLength(0); x++)
+        for (int x = 0; x < Width; x++)
         {
-            for (int y = 0; y < cave.GetLength(1); y++)
+            for (int y = 0; y < Height; y++)
             {
-                if (x < BorderThickness || x > cave.GetLength(0) - BorderThickness - 1 || y < BorderThickness || y > cave.GetLength(1) - BorderThickness - 1)
+                if (x < BorderThickness || x > Width - BorderThickness - 1 || y < BorderThickness || y > Height - BorderThickness - 1)
                 {
                     cave[x, y] = CaveTile.Wall;
                 }
@@ -98,9 +110,23 @@ public class MapGenerator : MonoBehaviour
         cave = smoothCave;
     }
 
-    private void RemoveFeatures()
+    private void RemoveSmallRegionsOfTypes(params CaveTile[] roomTypes)
     {
-        
+        foreach (var type in roomTypes)
+        {
+            List<Region> regions = GetRegions(type);
+
+            foreach (var region in regions)
+            {
+                if (region.roomSize < MinimumRegionSize)
+                {
+                    foreach (Coord tile in region.tiles)
+                    {
+                        cave[tile.X, tile.Y] = (type == CaveTile.Wall ? CaveTile.Air : CaveTile.Wall); // TODO support for more tile types
+                    }
+                }
+            }
+        }
     }
 
     private void Generate2DMesh()
@@ -153,6 +179,287 @@ public class MapGenerator : MonoBehaviour
         }
         return wallCount;
     }
+
+
+    List<Coord> GetRegionTiles(uint startX, uint startY)
+    {
+        List<Coord> tiles = new List<Coord>();
+        bool[,] checkedCave = new bool[Width, Height];
+
+        CaveTile tileType = cave[startX, startY];
+
+        Queue<Coord> queue = new Queue<Coord>();
+
+        queue.Enqueue(new Coord(startX, startY));
+
+        checkedCave[startX, startY] = true;
+
+        while (queue.Count > 0)
+        {
+            Coord tile = queue.Dequeue();
+            tiles.Add(tile);
+
+            for (uint x = tile.X - 1; x <= tile.X + 1; x++)
+            {
+                for (uint y = tile.Y - 1; y <= tile.Y + 1; y++)
+                {
+                    if (IsInMapRange(x, y) && (y == tile.Y || x == tile.X))
+                    {
+                        if (checkedCave[x, y] == false && cave[x, y] == tileType)
+                        {
+                            checkedCave[x, y] = true;
+                            queue.Enqueue(new Coord(x, y));
+                        }
+                    }
+                }
+            }
+        }
+
+        return tiles;
+    }
+
+    List<Region> GetRegions(CaveTile tileType)
+    {
+        List<Region> regions = new List<Region>();
+        bool[,] checkedCave = new bool[Width, Height];
+
+        for (uint x = 0; x < Width; x++)
+        {
+            for (uint y = 0; y < Height; y++)
+            {
+                if (checkedCave[x, y] == false && cave[x, y] == tileType)
+                {
+                    List<Coord> tiles = GetRegionTiles(x, y);
+                    Region newRegion = new Region(tiles, cave);
+                    regions.Add(newRegion);
+
+                    foreach (Coord tile in tiles)
+                    {
+                        checkedCave[tile.X, tile.Y] = true;
+                    }
+                }
+            }
+        }
+
+        return regions;
+    }
+
+    bool IsInMapRange(uint x, uint y)
+    {
+        return x >= 0 && x < Width && y >= 0 && y < Height;
+    }
+
+    struct Coord
+    {
+        public uint X;
+        public uint Y;
+
+        public Coord(uint x, uint y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked 
+            {
+                int hash = 73;
+                hash = (hash * 79) + X.GetHashCode();
+                hash = (hash * 83) + Y.GetHashCode();
+                return hash;
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            Coord other = (Coord) obj;
+            return (this.X == other.X && this.Y == other.Y);
+        }
+    }
+
+
+    void ConnectFirstRegion(List<Region> regions)
+    {
+        if (regions.Count < 2) return;
+
+        double bestDistance = Width + Height; // Ensured to be larger than distance between any two regions
+        Coord bestTileA = new Coord();
+        Coord bestTileB = new Coord();
+        Region firstRegion = regions[0];
+
+        foreach (var region in regions.GetRange(1, regions.Count))
+        {
+            (Coord tileA, Coord tileB) = FindClosestTilesBetweenRegions(firstRegion, region);
+            double distanceBetweenRegions = GetDistanceBetweenTiles(tileA, tileB);
+            if (distanceBetweenRegions < bestDistance)
+            {
+                bestTileA = tileA;
+                bestTileB = tileB;
+            }
+        }
+
+        ConnectTiles(bestTileA, bestTileB);
+    }
+
+    Vector2 CoordToWorldPoint(Coord tile)
+    {
+        return new Vector2(-Width / 2 + .5f + tile.X, -Height / 2 + .5f + tile.Y);
+    }
+
+    class Region : IComparable<Region>
+    {
+        public List<Coord> tiles;
+        public int roomSize;
+        public CaveTile regionType;
+
+        public Region()
+        {
+        }
+
+        public Region(List<Coord> roomTiles, CaveTile[,] cave)
+        {
+            tiles = roomTiles;
+            roomSize = tiles.Count;
+            regionType = cave[tiles[0].X, tiles[0].Y];
+        }
+
+        public int CompareTo(Region other)
+        {
+            return other.roomSize.CompareTo(roomSize);
+        }
+
+        public override bool Equals(object obj)
+        {
+            Region other = (Region)obj;
+            return this.tiles == other.tiles;
+        }
+
+        public override int GetHashCode()
+        {
+            return tiles.GetHashCode();
+        }
+    }
+
+
+    List<Coord> GetLine(Coord from, Coord to) // TODO rewrite
+    {
+        List<Coord> line = new List<Coord>();
+
+        int x = (int) from.X;
+        int y = (int) from.Y;
+
+        int dx = (int) (to.X - from.X);
+        int dy = (int) (to.Y - from.Y);
+
+        bool inverted = false;
+        int step = Math.Sign(dx);
+        int gradientStep = Math.Sign(dy);
+
+        int longest = Mathf.Abs(dx);
+        int shortest = Mathf.Abs(dy);
+
+        if (longest < shortest)
+        {
+            inverted = true;
+            longest = Mathf.Abs(dy);
+            shortest = Mathf.Abs(dx);
+
+            step = Math.Sign(dy);
+            gradientStep = Math.Sign(dx);
+        }
+
+        int gradientAccumulation = longest / 2;
+        for (int i = 0; i < longest; i++)
+        {
+            line.Add(new Coord((uint) x, (uint) y));
+
+            if (inverted)
+            {
+                y += step;
+            }
+            else
+            {
+                x += step;
+            }
+
+            gradientAccumulation += shortest;
+            if (gradientAccumulation >= longest)
+            {
+                if (inverted)
+                {
+                    x += gradientStep;
+                }
+                else
+                {
+                    y += gradientStep;
+                }
+                gradientAccumulation -= longest;
+            }
+        }
+
+        return line;
+    }
+
+    void ConnectTiles(Coord tileA, Coord tileB)
+    {        
+        Debug.DrawLine(CoordToWorldPoint(tileA), CoordToWorldPoint(tileB), Color.green, 10);
+
+        List<Coord> line = GetLine(tileA, tileB);
+        foreach (Coord c in line)
+        {
+            DrawCircle(c, PassageWidth, CaveTile.Air);
+        }
+    }
+
+    private Tuple<Coord, Coord> FindClosestTilesBetweenRegions(Region regionA, Region regionB)
+    {
+        Coord bestTileA = new Coord();
+        Coord bestTileB = new Coord();
+        double bestDistance = Width + Height;
+
+        foreach (Coord tileA in regionA.tiles)
+        {
+            foreach (Coord tileB in regionB.tiles)
+            {
+                double distanceBetweenRegions = GetDistanceBetweenTiles(tileA, tileB);
+
+                if (distanceBetweenRegions < bestDistance)
+                {
+                    bestDistance = distanceBetweenRegions;
+                    bestTileA = tileA;
+                    bestTileB = tileB;
+                }
+            }
+        }
+
+        return new Tuple<Coord, Coord>(bestTileA, bestTileB);
+    }
+
+    private static double GetDistanceBetweenTiles(Coord tileA, Coord tileB)
+    {
+        return Math.Pow(tileA.X - tileB.X, 2) + Mathf.Pow(tileA.Y - tileB.Y, 2);
+    }
+
+    void DrawCircle(Coord c, uint r, CaveTile tileType)
+    {
+        for (uint x = r; x <= r; x++)
+        {
+            for (uint y = r; y <= r; y++)
+            {
+                if (x * x + y * y <= r * r)
+                {
+                    uint drawX = c.X + x;
+                    uint drawY = c.Y + y;
+                    if (IsInMapRange(drawX, drawY))
+                    {
+                        cave[drawX, drawY] = tileType;
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 public enum CaveTile
