@@ -162,8 +162,7 @@ public class Coord
             new Coord(X+1, Y), // right
             new Coord(X, Y-1), // below
             new Coord(X, Y+1), // above
-
-        };        
+        };
 
     }
 
@@ -230,18 +229,17 @@ public class Cave
     public List<Region> GetRegions(CaveTile type)
     {
         var regions = new List<Region>();
-        var visited = new List<Coord>();
+        var visited = new bool[Width, Height];
 
         for (var x = 0; x < Width; x++)
         {
             for (var y = 0; y < Height; y++)
             {
-                var coord = new Coord(x, y);
-
-                if (!visited.Contains(coord) && Tiles[x,y] == type)
+                if (!visited[x,y] && Tiles[x,y] == type)
                 {
-                    var coords = GetRegionTiles(coord, ref visited);
-                    regions.Add(new Region(coords, Tiles[x, y]));
+                    var coord = new Coord(x, y);
+                    var tiles = GetRegionTiles(coord, ref visited);
+                    regions.Add(new Region(tiles, Tiles[x, y]));
                 }                               
             }
         }
@@ -249,13 +247,13 @@ public class Cave
         return regions;
     }
 
-    private List<Coord> GetRegionTiles(Coord start, ref List<Coord> visited)
+    private List<Coord> GetRegionTiles(Coord start, ref bool[,] visited)
     {
         var tiles = new List<Coord>();
         CaveTile tileType = Tiles[start.X, start.Y];
         var queue = new Queue<Coord>();
         queue.Enqueue(start);
-        visited.Add(start);
+        visited[start.X, start.Y] = true;
 
         while (queue.Count > 0)
         {
@@ -266,10 +264,10 @@ public class Cave
                 
             foreach (var neighbour in neighbours)
             {
-                if (Tiles[neighbour.X, neighbour.Y] == tileType && !visited.Contains(neighbour))
+                if (Tiles[neighbour.X, neighbour.Y] == tileType && !visited[neighbour.X, neighbour.Y])
                 {
                     queue.Enqueue(neighbour);
-                    visited.Add(neighbour);
+                    visited[neighbour.X, neighbour.Y] = true;
                 }
             }
         }
@@ -343,7 +341,6 @@ public class Cave
     public void ConnectAllRegionsOfType(CaveTile type, int passageWidth)
     {
         var regions = GetRegions(type);
-        int counter = 0; // debug
         
         while (regions.Count > 1)
         {
@@ -368,9 +365,6 @@ public class Cave
             CreatePassage(bestTileA, bestTileB, type, passageWidth);
 
             regions = GetRegions(type);
-
-            counter++; // debug
-            if (counter > 10) break; // debug
         }                
     }
 
