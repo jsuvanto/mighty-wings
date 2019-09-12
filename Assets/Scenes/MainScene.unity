@@ -376,11 +376,13 @@ MonoBehaviour:
   Height: 72
   RandomFillPercentage: 50
   BorderThickness: 1
-  SmoothingCount: 0
+  SmoothingCount: 5
   Seed: jsuv
-  UseRandomSeed: 1
-  MinimumFeatureSize: 0
-  RemoveSmallFeatures: 0
+  UseRandomSeed: 0
+  MinimumRegionSize: 50
+  RemoveSmallRegions: 0
+  PassageWidth: 5
+  ConnectAllRooms: 0
   DrawGizmos: 1
 --- !u!4 &2121411494
 Transform:

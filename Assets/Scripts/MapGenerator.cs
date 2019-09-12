@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshGenerator))]
 public class MapGenerator : MonoBehaviour
 {
 
-    private CaveTile[,] cave;
+    private Cave cave;
     
     public uint Width = 128;
     public uint Height = 72;
@@ -27,6 +28,8 @@ public class MapGenerator : MonoBehaviour
     
     public bool DrawGizmos = true;
 
+    private MeshGenerator meshGenerator;
+
     void Start()
     {
         GenerateCave();
@@ -42,59 +45,257 @@ public class MapGenerator : MonoBehaviour
 
     private void GenerateCave()
     {
-        cave = new CaveTile[Width, Height];
-        RandomFillMap();
+        cave = new Cave(Width, Height, RandomFillPercentage, BorderThickness);
+
+        cave.Generate(UseRandomSeed ? (int)DateTimeOffset.Now.ToUnixTimeSeconds() : Seed.GetHashCode() );
+
         for (int i = 0; i < SmoothingCount; i++)
         {
-            SmoothCave();
+            cave.SmoothCave();
         }
 
-        if (RemoveSmallRegions) RemoveSmallRegionsOfTypes(CaveTile.Air, CaveTile.Wall);
+        if (RemoveSmallRegions)
+        {
+            cave.ReplaceRegions(CaveTile.Air, CaveTile.Wall, MinimumRegionSize);
+            cave.ReplaceRegions(CaveTile.Wall, CaveTile.Air, MinimumRegionSize);
+        }
 
-        if (ConnectAllRooms) ConnectAllRegionsOfType(CaveTile.Air);
+        if (ConnectAllRooms)
+        {
+            cave.ConnectAllRegionsOfType(CaveTile.Air, (int) PassageWidth);
+        }
 
-        Generate2DMesh();
-    }
+        meshGenerator = GetComponent<MeshGenerator>();
+        meshGenerator.GenerateMesh(cave.Tiles, 1);
+    }   
 
-    private void ConnectAllRegionsOfType(CaveTile type) // TODO crash inbound
+    private void OnDrawGizmos()
     {
-        var regions = GetRegions(type);
-        while (regions.Count > 1) // TODO: this is recursive (nice) but wasteful (not nice)
-        {
-            ConnectFirstRegion(regions);
-            regions = GetRegions(type);
-        }
-    }
+        if (!DrawGizmos) return;
 
-    private void RandomFillMap()
-    {       
-        System.Random random = new System.Random(UseRandomSeed ? (int) DateTimeOffset.Now.ToUnixTimeSeconds() : Seed.GetHashCode());
-
-        for (int x = 0; x < Width; x++)
+        if (cave != null)
         {
-            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
             {
-                if (x < BorderThickness || x > Width - BorderThickness - 1 || y < BorderThickness || y > Height - BorderThickness - 1)
+                for (int y = 0; y < Height; y++)
                 {
-                    cave[x, y] = CaveTile.Wall;
-                }
-                else
-                {
-                    cave[x, y] = random.Next(0, 100) < RandomFillPercentage ? CaveTile.Wall : CaveTile.Air;
+                    switch (cave.Tiles[x,y])
+                    {
+                        case CaveTile.Wall:
+                            Gizmos.color = Color.black;
+                            break;
+                        case CaveTile.Air:
+                            Gizmos.color = Color.white;
+                            break;
+                        default:
+                            Gizmos.color = Color.red;
+                            break;
+                    }
+                    Vector2 pos = new Vector2(-Width / 2 + x + .5f, -Height / 2 + y + .5f);
+                    Gizmos.DrawCube(pos, Vector3.one);
                 }
             }
         }
     }
 
-    private void SmoothCave()
-    {
-        var smoothCave = cave;
 
-        for (uint x = BorderThickness; x < cave.GetLength(0) - BorderThickness; x++)
+}
+
+public enum CaveTile
+{
+    Wall, Air
+}
+
+public class Region : IComparable<Region>
+{
+    public List<Coord> Tiles { get; private set; }
+    public int RoomSize { get => Tiles.Count; }
+    public CaveTile Type { get; private set; }
+
+    public Region()
+    {
+    }
+
+    public Region(List<Coord> roomTiles, CaveTile type)
+    {
+        Tiles = roomTiles;
+        Type = type;
+    }
+
+    public int CompareTo(Region other)
+    {
+        return other.RoomSize.CompareTo(RoomSize);
+    }
+
+    public override bool Equals(object obj)
+    {
+        Region other = (Region)obj;
+        return this.Tiles == other.Tiles;
+    }
+
+    public override int GetHashCode()
+    {
+        return Tiles.GetHashCode();
+    }
+}
+
+public class Coord
+{
+    public int X { get; private set; }
+    public int Y { get; private set; }
+
+    public Coord()
+    {
+    }
+
+    public Coord(int x, int y)
+    {
+        X = x;
+        Y = y;
+    }
+
+    public List<Coord> GetNeighbours()
+    {
+        return new List<Coord>
         {
-            for (uint y = BorderThickness; y < cave.GetLength(1) - BorderThickness; y++)
+            new Coord(X-1, Y), // left
+            new Coord(X+1, Y), // right
+            new Coord(X, Y-1), // below
+            new Coord(X, Y+1), // above
+
+        };        
+
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            int hash = 73;
+            hash = (hash * 79) + X.GetHashCode();
+            hash = (hash * 83) + Y.GetHashCode();
+            return hash;
+        }
+    }
+
+    public override bool Equals(object obj)
+    {
+        Coord other = (Coord)obj;
+        return (this.X == other.X && this.Y == other.Y);
+    }
+
+    public override string ToString()
+    {
+        return $"Coord X: {X} Y: {Y}";
+    }
+}
+
+public class Cave
+{    
+    public CaveTile[,] Tiles { get; private set; }
+    public int Width { get => Tiles.GetLength(0); }
+    public int Height { get => Tiles.GetLength(1); }
+
+    private readonly int _randomFillPercentage;
+    private readonly int _borderThickness;
+
+    public Cave(uint width, uint height, uint randomFillPercentage, uint borderThickness)
+    {
+        Tiles = new CaveTile[width, height];
+        _randomFillPercentage = (int) randomFillPercentage;
+        _borderThickness = (int) borderThickness;
+    }
+
+    public void Generate(int seed)
+    {
+        System.Random random = new System.Random(seed);
+
+        for (int x = 0; x < Width; x++)
+        {
+            for (int y = 0; y < Height; y++)
             {
-                uint neighbourWallTiles = GetSurroundingWallCount(x, y);
+                if (x < _borderThickness || x > Width - _borderThickness - 1 || y < _borderThickness || y > Height - _borderThickness - 1)
+                {
+                    Tiles[x, y] = CaveTile.Wall;
+                }
+                else
+                {
+                    Tiles[x, y] = random.Next(0, 100) < _randomFillPercentage ? CaveTile.Wall : CaveTile.Air;
+                }
+            }
+        }
+
+    }
+
+    public List<Region> GetRegions(CaveTile type)
+    {
+        var regions = new List<Region>();
+        var visited = new List<Coord>();
+
+        for (var x = 0; x < Width; x++)
+        {
+            for (var y = 0; y < Height; y++)
+            {
+                var coord = new Coord(x, y);
+
+                if (!visited.Contains(coord) && Tiles[x,y] == type)
+                {
+                    var coords = GetRegionTiles(coord, ref visited);
+                    regions.Add(new Region(coords, Tiles[x, y]));
+                }                               
+            }
+        }
+
+        return regions;
+    }
+
+    private List<Coord> GetRegionTiles(Coord start, ref List<Coord> visited)
+    {
+        var tiles = new List<Coord>();
+        CaveTile tileType = Tiles[start.X, start.Y];
+        var queue = new Queue<Coord>();
+        queue.Enqueue(start);
+        visited.Add(start);
+
+        while (queue.Count > 0)
+        {
+            Coord tile = queue.Dequeue();
+            tiles.Add(tile);
+            
+            var neighbours = tile.GetNeighbours().Where(t => IsInMapRange(t));
+                
+            foreach (var neighbour in neighbours)
+            {
+                if (Tiles[neighbour.X, neighbour.Y] == tileType && !visited.Contains(neighbour))
+                {
+                    queue.Enqueue(neighbour);
+                    visited.Add(neighbour);
+                }
+            }
+        }
+
+        return tiles;
+    }
+
+    private bool IsInMapRange(Coord tile)
+    {
+        return IsInMapRange(tile.X, tile.Y);
+    }
+
+    private bool IsInMapRange(int x, int y)
+    {
+        return x >= 0 && x < Width && y >= 0 && y < Height;
+    }
+
+    public void SmoothCave()
+    {
+        var smoothCave = Tiles;
+
+        for (int x = _borderThickness; x < Width - _borderThickness; x++)
+        {
+            for (int y = _borderThickness; y < Height - _borderThickness; y++)
+            {
+                var neighbourWallTiles = GetSurroundingTileCount(x, y, CaveTile.Wall);
 
                 if (neighbourWallTiles > 4)
                 {
@@ -107,308 +308,78 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
-        cave = smoothCave;
+        Tiles = smoothCave;
     }
 
-    private void RemoveSmallRegionsOfTypes(params CaveTile[] roomTypes)
+    private int GetSurroundingTileCount(int gridX, int gridY, CaveTile type)
     {
-        foreach (var type in roomTypes)
+        var wallCount = 0;
+        for (var neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++)
         {
-            List<Region> regions = GetRegions(type);
-
-            foreach (var region in regions)
-            {
-                if (region.roomSize < MinimumRegionSize)
-                {
-                    foreach (Coord tile in region.tiles)
-                    {
-                        cave[tile.X, tile.Y] = (type == CaveTile.Wall ? CaveTile.Air : CaveTile.Wall); // TODO support for more tile types
-                    }
-                }
-            }
-        }
-    }
-
-    private void Generate2DMesh()
-    {
-        MeshGenerator meshGen = GetComponent<MeshGenerator>();
-        meshGen.GenerateMesh(cave, 1);
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (!DrawGizmos) return;
-
-        if (cave != null)
-        {
-            for (int x = 0; x < Width; x++)
-            {
-                for (int y = 0; y < Height; y++)
-                {
-                    switch (cave[x,y])
-                    {
-                        case CaveTile.Wall:
-                            Gizmos.color = Color.black;
-                            break;
-                        case CaveTile.Air:
-                            Gizmos.color = Color.white;
-                            break;
-                        default:
-                            Gizmos.color = Color.clear;
-                            break;
-                    }
-                    Vector2 pos = new Vector2(-Width / 2 + x + .5f, -Height / 2 + y + .5f);
-                    Gizmos.DrawCube(pos, Vector3.one);
-                }
-            }
-        }
-    }
-
-    private uint GetSurroundingWallCount(uint gridX, uint gridY)
-    {        
-        uint wallCount = 0;
-        for (uint neighbourX = gridX - 1; neighbourX <= gridX + 1; neighbourX++)
-        {
-            for (uint neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++)
+            for (var neighbourY = gridY - 1; neighbourY <= gridY + 1; neighbourY++)
             {
                 if (neighbourX != gridX || neighbourY != gridY)
                 {
-                    wallCount += (uint) (cave[neighbourX, neighbourY] == CaveTile.Wall ? 1 : 0);
+                    wallCount += Tiles[neighbourX, neighbourY] == type ? 1 : 0;
                 }
             }
         }
         return wallCount;
     }
 
-
-    List<Coord> GetRegionTiles(uint startX, uint startY)
+    public void ReplaceRegions(CaveTile from, CaveTile to, uint minimumSize)
     {
-        List<Coord> tiles = new List<Coord>();
-        bool[,] checkedCave = new bool[Width, Height];
+        var smallRegions = GetRegions(from).Where(r => r.RoomSize < minimumSize);
 
-        CaveTile tileType = cave[startX, startY];
-
-        Queue<Coord> queue = new Queue<Coord>();
-
-        queue.Enqueue(new Coord(startX, startY));
-
-        checkedCave[startX, startY] = true;
-
-        while (queue.Count > 0)
+        foreach (var region in smallRegions)
         {
-            Coord tile = queue.Dequeue();
-            tiles.Add(tile);
-
-            for (uint x = tile.X - 1; x <= tile.X + 1; x++)
+            foreach (Coord tile in region.Tiles)
             {
-                for (uint y = tile.Y - 1; y <= tile.Y + 1; y++)
+                Tiles[tile.X, tile.Y] = to;
+            }
+        }
+    }
+
+    public void ConnectAllRegionsOfType(CaveTile type, int passageWidth)
+    {
+        var regions = GetRegions(type);
+        int counter = 0; // debug
+        
+        while (regions.Count > 1)
+        {
+            var region = regions[0];
+            regions.Remove(region);
+            double bestDistance = Width + Height; // Ensured to be larger than distance between any two regions
+            Coord bestTileA = new Coord();
+            Coord bestTileB = new Coord();
+
+            foreach (var otherRegion in regions)
+            {
+                (Coord tileA, Coord tileB) = FindClosestTilesBetweenRegions(region, otherRegion);
+                double distanceBetweenRegions = GetDistanceBetweenTiles(tileA, tileB);
+                if (distanceBetweenRegions < bestDistance)
                 {
-                    if (IsInMapRange(x, y) && (y == tile.Y || x == tile.X))
-                    {
-                        if (checkedCave[x, y] == false && cave[x, y] == tileType)
-                        {
-                            checkedCave[x, y] = true;
-                            queue.Enqueue(new Coord(x, y));
-                        }
-                    }
+                    bestDistance = distanceBetweenRegions;
+                    bestTileA = tileA;
+                    bestTileB = tileB;
                 }
-            }
-        }
+            }          
 
-        return tiles;
+            CreatePassage(bestTileA, bestTileB, type, passageWidth);
+
+            regions = GetRegions(type);
+
+            counter++; // debug
+            if (counter > 10) break; // debug
+        }                
     }
 
-    List<Region> GetRegions(CaveTile tileType)
+    void CreatePassage(Coord tileA, Coord tileB, CaveTile type, int width)
     {
-        List<Region> regions = new List<Region>();
-        bool[,] checkedCave = new bool[Width, Height];
-
-        for (uint x = 0; x < Width; x++)
-        {
-            for (uint y = 0; y < Height; y++)
-            {
-                if (checkedCave[x, y] == false && cave[x, y] == tileType)
-                {
-                    List<Coord> tiles = GetRegionTiles(x, y);
-                    Region newRegion = new Region(tiles, cave);
-                    regions.Add(newRegion);
-
-                    foreach (Coord tile in tiles)
-                    {
-                        checkedCave[tile.X, tile.Y] = true;
-                    }
-                }
-            }
-        }
-
-        return regions;
-    }
-
-    bool IsInMapRange(uint x, uint y)
-    {
-        return x >= 0 && x < Width && y >= 0 && y < Height;
-    }
-
-    struct Coord
-    {
-        public uint X;
-        public uint Y;
-
-        public Coord(uint x, uint y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked 
-            {
-                int hash = 73;
-                hash = (hash * 79) + X.GetHashCode();
-                hash = (hash * 83) + Y.GetHashCode();
-                return hash;
-            }
-        }
-
-        public override bool Equals(object obj)
-        {
-            Coord other = (Coord) obj;
-            return (this.X == other.X && this.Y == other.Y);
-        }
-    }
-
-
-    void ConnectFirstRegion(List<Region> regions)
-    {
-        if (regions.Count < 2) return;
-
-        double bestDistance = Width + Height; // Ensured to be larger than distance between any two regions
-        Coord bestTileA = new Coord();
-        Coord bestTileB = new Coord();
-        Region firstRegion = regions[0];
-
-        foreach (var region in regions.GetRange(1, regions.Count))
-        {
-            (Coord tileA, Coord tileB) = FindClosestTilesBetweenRegions(firstRegion, region);
-            double distanceBetweenRegions = GetDistanceBetweenTiles(tileA, tileB);
-            if (distanceBetweenRegions < bestDistance)
-            {
-                bestTileA = tileA;
-                bestTileB = tileB;
-            }
-        }
-
-        ConnectTiles(bestTileA, bestTileB);
-    }
-
-    Vector2 CoordToWorldPoint(Coord tile)
-    {
-        return new Vector2(-Width / 2 + .5f + tile.X, -Height / 2 + .5f + tile.Y);
-    }
-
-    class Region : IComparable<Region>
-    {
-        public List<Coord> tiles;
-        public int roomSize;
-        public CaveTile regionType;
-
-        public Region()
-        {
-        }
-
-        public Region(List<Coord> roomTiles, CaveTile[,] cave)
-        {
-            tiles = roomTiles;
-            roomSize = tiles.Count;
-            regionType = cave[tiles[0].X, tiles[0].Y];
-        }
-
-        public int CompareTo(Region other)
-        {
-            return other.roomSize.CompareTo(roomSize);
-        }
-
-        public override bool Equals(object obj)
-        {
-            Region other = (Region)obj;
-            return this.tiles == other.tiles;
-        }
-
-        public override int GetHashCode()
-        {
-            return tiles.GetHashCode();
-        }
-    }
-
-
-    List<Coord> GetLine(Coord from, Coord to) // TODO rewrite
-    {
-        List<Coord> line = new List<Coord>();
-
-        int x = (int) from.X;
-        int y = (int) from.Y;
-
-        int dx = (int) (to.X - from.X);
-        int dy = (int) (to.Y - from.Y);
-
-        bool inverted = false;
-        int step = Math.Sign(dx);
-        int gradientStep = Math.Sign(dy);
-
-        int longest = Mathf.Abs(dx);
-        int shortest = Mathf.Abs(dy);
-
-        if (longest < shortest)
-        {
-            inverted = true;
-            longest = Mathf.Abs(dy);
-            shortest = Mathf.Abs(dx);
-
-            step = Math.Sign(dy);
-            gradientStep = Math.Sign(dx);
-        }
-
-        int gradientAccumulation = longest / 2;
-        for (int i = 0; i < longest; i++)
-        {
-            line.Add(new Coord((uint) x, (uint) y));
-
-            if (inverted)
-            {
-                y += step;
-            }
-            else
-            {
-                x += step;
-            }
-
-            gradientAccumulation += shortest;
-            if (gradientAccumulation >= longest)
-            {
-                if (inverted)
-                {
-                    x += gradientStep;
-                }
-                else
-                {
-                    y += gradientStep;
-                }
-                gradientAccumulation -= longest;
-            }
-        }
-
-        return line;
-    }
-
-    void ConnectTiles(Coord tileA, Coord tileB)
-    {        
-        Debug.DrawLine(CoordToWorldPoint(tileA), CoordToWorldPoint(tileB), Color.green, 10);
-
         List<Coord> line = GetLine(tileA, tileB);
         foreach (Coord c in line)
         {
-            DrawCircle(c, PassageWidth, CaveTile.Air);
+            DrawCircle(c, width, type);
         }
     }
 
@@ -418,9 +389,9 @@ public class MapGenerator : MonoBehaviour
         Coord bestTileB = new Coord();
         double bestDistance = Width + Height;
 
-        foreach (Coord tileA in regionA.tiles)
+        foreach (Coord tileA in regionA.Tiles)
         {
-            foreach (Coord tileB in regionB.tiles)
+            foreach (Coord tileB in regionB.Tiles)
             {
                 double distanceBetweenRegions = GetDistanceBetweenTiles(tileA, tileB);
 
@@ -438,31 +409,63 @@ public class MapGenerator : MonoBehaviour
 
     private static double GetDistanceBetweenTiles(Coord tileA, Coord tileB)
     {
-        return Math.Pow(tileA.X - tileB.X, 2) + Mathf.Pow(tileA.Y - tileB.Y, 2);
+        int dx = (int) (tileA.X - tileB.X);
+        int dy = (int) (tileA.Y - tileB.Y);
+
+        return Math.Sqrt(dx*dx + dy*dy);
     }
 
-    void DrawCircle(Coord c, uint r, CaveTile tileType)
+    void DrawCircle(Coord c, int r, CaveTile tileType)
     {
-        for (uint x = r; x <= r; x++)
+        for (int x = -r; x <= r; x++)
         {
-            for (uint y = r; y <= r; y++)
+            for (int y = -r; y <= r; y++)
             {
                 if (x * x + y * y <= r * r)
                 {
-                    uint drawX = c.X + x;
-                    uint drawY = c.Y + y;
+                    int drawX = c.X + x;
+                    int drawY = c.Y + y;
                     if (IsInMapRange(drawX, drawY))
                     {
-                        cave[drawX, drawY] = tileType;
+                        Tiles[drawX, drawY] = tileType;
                     }
                 }
             }
         }
     }
 
-}
+    List<Coord> GetLine(Coord from, Coord to)
+    {
+        // Bresenham
 
-public enum CaveTile
-{
-    Wall, Air
+        Debug.DrawLine(CoordToWorldPoint(from), CoordToWorldPoint(to), Color.green, 10);
+
+        List<Coord> line = new List<Coord>();
+
+        int x = (int)from.X;
+        int y = (int)from.Y;
+
+        int dx = (int)Math.Abs(to.X - x);
+        int sx = x < to.X ? 1 : -1;
+        int dy = (int)Math.Abs(to.Y - y);
+        int sy = y < to.Y ? 1 : -1;
+
+        int err = (dx > dy ? dx : -dy) / 2, e2;
+        for (; ; )
+        {
+            line.Add(new Coord(x, y));
+            if (x == to.X && y == to.Y) break;
+            e2 = err;
+            if (e2 > -dx) { err -= dy; x += sx; }
+            if (e2 < dy) { err += dx; y += sy; }
+        }
+        return line;
+
+    }
+
+    Vector2 CoordToWorldPoint(Coord tile)
+    {
+        return new Vector2(-Width / 2 + .5f + tile.X, -Height / 2 + .5f + tile.Y);
+    }
+
 }
