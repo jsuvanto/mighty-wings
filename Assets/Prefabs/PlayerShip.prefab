@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 2023796972455111716}
   - component: {fileID: 2023796972455111719}
   - component: {fileID: 2023796972455111718}
-  - component: {fileID: 2023796972455111721}
   - component: {fileID: 4919291614407029478}
   - component: {fileID: 7594537542767385948}
   m_Layer: 0
@@ -98,13 +97,13 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 1
   m_GravityScale: 1
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
+  m_CollisionDetection: 1
+  m_Constraints: 4
 --- !u!60 &2023796972455111718
 PolygonCollider2D:
   m_ObjectHideFlags: 0
@@ -133,22 +132,6 @@ PolygonCollider2D:
     - - {x: 0, y: 0.3}
       - {x: -0.255, y: -0.305}
       - {x: 0.255, y: -0.305}
---- !u!58 &2023796972455111721
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2023796972455111720}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.135}
-  serializedVersion: 2
-  m_Radius: 0.16
 --- !u!114 &4919291614407029478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,7 +145,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerNumber: 0
-  ThrottleForce: 1000
+  ThrottleForce: 50
   SteeringSpeed: 10
   CameraPrefab: {fileID: 5672277640034418320, guid: 3bf9d29c04cd2764b90acf4869da439b,
     type: 3}
