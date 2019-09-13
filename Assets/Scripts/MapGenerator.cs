@@ -28,8 +28,6 @@ public class MapGenerator : MonoBehaviour
     
     public bool DrawGizmos = true;
 
-    private MeshGenerator meshGenerator;
-
     void Start()
     {
         GenerateCave();
@@ -65,7 +63,7 @@ public class MapGenerator : MonoBehaviour
             cave.ConnectAllRegionsOfType(CaveTile.Air, (int) PassageWidth);
         }
 
-        meshGenerator = GetComponent<MeshGenerator>();
+        MeshGenerator meshGenerator = GetComponent<MeshGenerator>();
         meshGenerator.GenerateMesh(cave.Tiles, 1);
     }   
 
