@@ -44,6 +44,16 @@ public class MeshGenerator : MonoBehaviour
         mesh.triangles = _triangles.ToArray();
         mesh.RecalculateNormals();
 
+        Vector2[] uvs = new Vector2[mesh.vertexCount];
+        for (int i = 0; i < uvs.Length; i++)
+        {
+            float percentX = Mathf.InverseLerp(-caveMap.GetLength(0) / 2 * squareSize, caveMap.GetLength(0) / 2 * squareSize, _vertices[i].x);
+            float percentY = Mathf.InverseLerp(-caveMap.GetLength(0) / 2 * squareSize, caveMap.GetLength(0) / 2 * squareSize, _vertices[i].y);
+            uvs[i] = new Vector2(percentX, percentY);
+            //uvs[i] = new Vector2(_vertices[i].x, _vertices[i].y);
+        }
+        mesh.uv = uvs;
+
         Generate2DColliders();
     }
 
@@ -165,9 +175,9 @@ public class MeshGenerator : MonoBehaviour
         _triangles.Add(b.vertexIndex);
         _triangles.Add(c.vertexIndex);
         Triangle triangle = new Triangle(a.vertexIndex, b.vertexIndex, c.vertexIndex);
-        AddTriangleToDictionary(triangle.vertexIndexA, triangle);
-        AddTriangleToDictionary(triangle.vertexIndexB, triangle);
-        AddTriangleToDictionary(triangle.vertexIndexC, triangle);
+        AddTriangleToDictionary(triangle.VertexIndexA, triangle);
+        AddTriangleToDictionary(triangle.VertexIndexB, triangle);
+        AddTriangleToDictionary(triangle.VertexIndexC, triangle);
     }
 
     void AddTriangleToDictionary(int vertexIndexKey, Triangle triangle)
@@ -299,7 +309,6 @@ public class SquareGrid
 
 public class Square
 {
-
     public ControlNode topLeft, topRight, bottomRight, bottomLeft;
     public Node centreTop, centreRight, centreBottom, centreLeft;
     public int configuration;
@@ -352,33 +361,23 @@ public class ControlNode : Node
 
 public struct Triangle
 {
-    public int vertexIndexA;
-    public int vertexIndexB;
-    public int vertexIndexC;
+    public int VertexIndexA { get => vertices[0]; }
+    public int VertexIndexB { get => vertices[1]; }
+    public int VertexIndexC { get => vertices[2]; }
     readonly int[] vertices;
 
     public Triangle(int a, int b, int c)
     {
-        vertexIndexA = a;
-        vertexIndexB = b;
-        vertexIndexC = c;
-
         vertices = new int[3];
         vertices[0] = a;
         vertices[1] = b;
         vertices[2] = c;
     }
 
-    public int this[int i]
-    {
-        get
-        {
-            return vertices[i];
-        }
-    }
+    public int this[int i] => vertices[i];
 
     public bool Contains(int vertexIndex)
     {
-        return vertexIndex == vertexIndexA || vertexIndex == vertexIndexB || vertexIndex == vertexIndexC;
+        return vertexIndex == VertexIndexA || vertexIndex == VertexIndexB || vertexIndex == VertexIndexC;
     }
 }
