@@ -436,12 +436,12 @@ public class Cave
 
         List<Coord> line = new List<Coord>();
 
-        int x = (int)from.X;
-        int y = (int)from.Y;
+        int x = from.X;
+        int y = from.Y;
 
-        int dx = (int)Math.Abs(to.X - x);
+        int dx = Math.Abs(to.X - x);
         int sx = x < to.X ? 1 : -1;
-        int dy = (int)Math.Abs(to.Y - y);
+        int dy = Math.Abs(to.Y - y);
         int sy = y < to.Y ? 1 : -1;
 
         int err = (dx > dy ? dx : -dy) / 2, e2;

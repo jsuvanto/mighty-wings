@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 7594537542767385948}
   m_Layer: 0
   m_Name: PlayerShip
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2023796972455111720}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.976, y: -0.012, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -161,6 +161,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 706d717c01b44ae4e8529694459c7023, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerNumber: 0
+  ThrottleForce: 1000
+  SteeringSpeed: 10
+  CameraPrefab: {fileID: 5672277640034418320, guid: 3bf9d29c04cd2764b90acf4869da439b,
+    type: 3}
 --- !u!114 &7594537542767385948
 MonoBehaviour:
   m_ObjectHideFlags: 0
