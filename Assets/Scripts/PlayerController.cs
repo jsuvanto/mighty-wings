@@ -16,7 +16,6 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _body = GetComponent<Rigidbody2D>();
-        
     }
 
     private void FixedUpdate()
@@ -37,7 +36,6 @@ public class PlayerController : MonoBehaviour
     public void Initialize(uint playerNumber)
     {
         PlayerNumber = playerNumber;
-
         name = $"Player {playerNumber}";
 
         var spriteRenderer = GetComponent<SpriteRenderer>();
@@ -60,8 +58,7 @@ public class PlayerController : MonoBehaviour
 
         float x = playerNumber % 2 == 0 ? 0.5f : 0;
         float y = playerNumber < 3 ? 0.5f : 0;
-        _camera = Instantiate(CameraPrefab);
-        _camera.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+        _camera = Instantiate(CameraPrefab, new Vector3(transform.position.x, transform.position.y, 0), new Quaternion());
         _cameraOffset = transform.position - _camera.transform.position;
         _camera.rect = new Rect(x, y, 0.5f, 0.5f);
         _camera.name = $"Player {playerNumber} camera";
