@@ -4,13 +4,17 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [HideInInspector]
+    public uint PlayerNumber;
     [Range(0,100)]
     public uint Health;
+    [Range(0, 100)]
+    public uint Lives;
 
-    public uint PlayerNumber;
     public uint ThrottleForce;
     public uint SteeringSpeed;
     public Camera CameraPrefab = new Camera();
+    public Weapon Weapon;
 
     private Rigidbody2D _body;
     private Camera _camera;
@@ -23,12 +27,22 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        // Steering
         float throttle = Mathf.Max(Input.GetAxis($"Player {PlayerNumber} Throttle"), 0);
         float steering = Input.GetAxis($"Player {PlayerNumber} Steering");
-
         _body.AddForce(throttle * ThrottleForce * _body.transform.up);
-
         _body.transform.Rotate(steering * SteeringSpeed * Vector3.forward);
+
+
+        // Firing
+        float fire = Input.GetAxis($"Player {PlayerNumber} Fire");
+        if (fire > 0)
+        {
+            print($"Player {PlayerNumber} firing");
+
+            Damage(10);
+        }
+
 
         if (Health <= 0)
         {
@@ -74,6 +88,11 @@ public class PlayerController : MonoBehaviour
 
     private void Die()
     {
+        print($"Player {PlayerNumber} died");
+    }
 
+    public void Damage(uint amount)
+    {
+        Health -= amount;
     }
 }
