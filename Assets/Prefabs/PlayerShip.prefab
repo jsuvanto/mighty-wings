@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 2023796972455111718}
   - component: {fileID: 4919291614407029478}
   - component: {fileID: 7594537542767385948}
-  - component: {fileID: 3306504316993713537}
   m_Layer: 0
   m_Name: PlayerShip
   m_TagString: Player
@@ -151,6 +150,7 @@ MonoBehaviour:
   SteeringSpeed: 10
   CameraPrefab: {fileID: 5672277640034418320, guid: 3bf9d29c04cd2764b90acf4869da439b,
     type: 3}
+  Weapon: {fileID: 0}
 --- !u!114 &7594537542767385948
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,17 +161,5 @@ MonoBehaviour:
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c982fc041e52adf4f91dcf5fb1c8d2ac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &3306504316993713537
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2023796972455111720}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee56ee7358bb6734285aa5eaf94e360d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
