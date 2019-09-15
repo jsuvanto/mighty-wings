@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Range(0,100)]
+    public uint Health;
+
     public uint PlayerNumber;
     public uint ThrottleForce;
     public uint SteeringSpeed;
@@ -26,6 +29,11 @@ public class PlayerController : MonoBehaviour
         _body.AddForce(throttle * ThrottleForce * _body.transform.up);
 
         _body.transform.Rotate(steering * SteeringSpeed * Vector3.forward);
+
+        if (Health <= 0)
+        {
+            Die();
+        }
     }
 
     private void LateUpdate()
@@ -62,5 +70,10 @@ public class PlayerController : MonoBehaviour
         _cameraOffset = transform.position - _camera.transform.position;
         _camera.rect = new Rect(x, y, 0.5f, 0.5f);
         _camera.name = $"Player {playerNumber} camera";
+    }
+
+    private void Die()
+    {
+
     }
 }
