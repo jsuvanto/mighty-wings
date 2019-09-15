@@ -10,13 +10,12 @@ public class GameController : MonoBehaviour
 
     public MapGenerator mapGenerator;
     public GameObject PlayerShip;
+    public Weapon[] Weapons;
 
     void Start()
     {
 
         // start menu
-
-        // spawn players
 
         Camera.main.enabled = false;
 
@@ -25,18 +24,8 @@ public class GameController : MonoBehaviour
             print($"Spawning player {playerNumber}");
             GameObject playerShip = Instantiate(PlayerShip, new Vector3(playerNumber, 0, 1), new Quaternion());
             var playerController = playerShip.GetComponent<PlayerController>();
+            playerController.Weapon = Instantiate(Weapons[0], playerShip.transform);
             playerController.Initialize(playerNumber);
         }
-
-
-        // assign controls to players
-
-        // disable main camera, spawn cameras for each player
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 }

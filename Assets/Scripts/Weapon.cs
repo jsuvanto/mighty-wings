@@ -20,12 +20,12 @@ public abstract class Weapon : MonoBehaviour
 
     public virtual void Fire()
     {
-
+        print($"Player {transform.parent.gameObject.GetComponent<PlayerController>().PlayerNumber} firing.");
     }
 
     public virtual void Reload()
     {
-
+        print($"Player {transform.parent.gameObject.GetComponent<PlayerController>().PlayerNumber} reloading.");
     }
 
 }

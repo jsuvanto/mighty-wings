@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
 
     public uint ThrottleForce;
     public uint SteeringSpeed;
-    public Camera CameraPrefab = new Camera();
+    public Camera CameraPrefab;
     public Weapon Weapon;
 
     private Rigidbody2D _body;
@@ -38,11 +38,8 @@ public class PlayerController : MonoBehaviour
         float fire = Input.GetAxis($"Player {PlayerNumber} Fire");
         if (fire > 0)
         {
-            print($"Player {PlayerNumber} firing");
-
-            Damage(10);
+            Weapon.Fire();
         }
-
 
         if (Health <= 0)
         {
@@ -80,7 +77,8 @@ public class PlayerController : MonoBehaviour
 
         float x = playerNumber % 2 == 0 ? 0.5f : 0;
         float y = playerNumber < 3 ? 0.5f : 0;
-        _camera = Instantiate(CameraPrefab, new Vector3(transform.position.x, transform.position.y, 0), new Quaternion());
+        _camera = Instantiate(CameraPrefab, GameObject.Find("Cameras").transform);
+        _camera.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
         _cameraOffset = transform.position - _camera.transform.position;
         _camera.rect = new Rect(x, y, 0.5f, 0.5f);
         _camera.name = $"Player {playerNumber} camera";

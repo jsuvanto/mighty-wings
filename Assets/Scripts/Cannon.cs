@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class Cannon : Weapon
 {
-    Cannon() : base()
+    public override void Fire()
     {
-
+        base.Fire();
+        print($"{nameof(Cannon)} firing");
     }
+
 }
