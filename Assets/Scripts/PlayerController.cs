@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     public uint PlayerNumber;
     public uint ThrottleForce;
     public uint SteeringSpeed;
-    public Camera CameraPrefab;
+    public Camera CameraPrefab = new Camera();
 
     private Rigidbody2D _body;
     private Camera _camera;
@@ -16,10 +16,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         _body = GetComponent<Rigidbody2D>();
-        _camera = Instantiate(CameraPrefab);
-        _camera.transform.position = new Vector3(transform.position.x, transform.position.y ,0);
         
-        _cameraOffset = transform.position - _camera.transform.position;
     }
 
     private void FixedUpdate()
@@ -37,14 +34,36 @@ public class PlayerController : MonoBehaviour
         _camera.transform.position = transform.position - _cameraOffset;
     }
 
-    void SetPlayerNumber(uint number)
+    public void Initialize(uint playerNumber)
     {
-        PlayerNumber = number;  
-    }
+        PlayerNumber = playerNumber;
 
-    void SetCamera(Camera camera)
-    {
-        _camera = camera;
-    }
+        name = $"Player {playerNumber}";
 
+        var spriteRenderer = GetComponent<SpriteRenderer>();
+
+        switch (playerNumber)
+        {
+            case 1:
+                spriteRenderer.color = Color.red;
+                break;
+            case 2:
+                spriteRenderer.color = Color.blue;
+                break;
+            case 3:
+                spriteRenderer.color = Color.green;
+                break;
+            case 4:
+                spriteRenderer.color = Color.yellow;
+                break;
+        }
+
+        float x = playerNumber % 2 == 0 ? 0.5f : 0;
+        float y = playerNumber < 3 ? 0.5f : 0;
+        _camera = Instantiate(CameraPrefab);
+        _camera.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+        _cameraOffset = transform.position - _camera.transform.position;
+        _camera.rect = new Rect(x, y, 0.5f, 0.5f);
+        _camera.name = $"Player {playerNumber} camera";
+    }
 }
