@@ -430,8 +430,6 @@ public class Cave
     {
         // Bresenham
 
-        Debug.DrawLine(CoordToWorldPoint(from), CoordToWorldPoint(to), Color.green, 10);
-
         List<Coord> line = new List<Coord>();
 
         int x = from.X;
