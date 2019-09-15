@@ -48,7 +48,7 @@ public class MeshGenerator : MonoBehaviour
         for (int i = 0; i < uvs.Length; i++)
         {
             float percentX = Mathf.InverseLerp(-caveMap.GetLength(0) / 2 * squareSize, caveMap.GetLength(0) / 2 * squareSize, _vertices[i].x);
-            float percentY = Mathf.InverseLerp(-caveMap.GetLength(0) / 2 * squareSize, caveMap.GetLength(0) / 2 * squareSize, _vertices[i].y);
+            float percentY = Mathf.InverseLerp(-caveMap.GetLength(1) / 2 * squareSize, caveMap.GetLength(1) / 2 * squareSize, _vertices[i].y);
             uvs[i] = new Vector2(percentX, percentY);
             //uvs[i] = new Vector2(_vertices[i].x, _vertices[i].y);
         }
