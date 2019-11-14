@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,13 +17,13 @@ public class PlayerController : MonoBehaviour
     public Camera CameraPrefab;
     public Weapon Weapon;
 
-    private Rigidbody2D _body;
-    private Camera _camera;
-    private Vector3 _cameraOffset;
-
+    private Rigidbody2D body;
+    private Camera playerCamera;
+    private Vector3 cameraOffset;
+    
     void Start()
     {
-        _body = GetComponent<Rigidbody2D>();
+        body = GetComponent<Rigidbody2D>();    
     }
 
     private void FixedUpdate()
@@ -30,15 +31,15 @@ public class PlayerController : MonoBehaviour
         // Steering
         float throttle = Mathf.Max(Input.GetAxis($"Player {PlayerNumber} Throttle"), 0);
         float steering = Input.GetAxis($"Player {PlayerNumber} Steering");
-        _body.AddForce(throttle * ThrottleForce * _body.transform.up);
-        _body.transform.Rotate(steering * SteeringSpeed * Vector3.forward);
+        body.AddForce(throttle * ThrottleForce * body.transform.up);
+        body.transform.Rotate(steering * SteeringSpeed * Vector3.forward);
 
 
-        // Firing
         float fire = Input.GetAxis($"Player {PlayerNumber} Fire");
         if (fire > 0)
         {
             Weapon.Fire();
+            Recoil(Weapon.Force);
         }
 
         if (Health <= 0)
@@ -47,9 +48,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void Recoil(float force)
+    {
+        GetComponent<Rigidbody2D>().AddForce(-transform.up * force);
+    }
+
     private void LateUpdate()
     {
-        _camera.transform.position = transform.position - _cameraOffset;
+        playerCamera.transform.position = transform.position - cameraOffset;       
     }
 
     public void Initialize(uint playerNumber)
@@ -77,11 +83,11 @@ public class PlayerController : MonoBehaviour
 
         float x = playerNumber % 2 == 0 ? 0.5f : 0;
         float y = playerNumber < 3 ? 0.5f : 0;
-        _camera = Instantiate(CameraPrefab, GameObject.Find("Cameras").transform);
-        _camera.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
-        _cameraOffset = transform.position - _camera.transform.position;
-        _camera.rect = new Rect(x, y, 0.5f, 0.5f);
-        _camera.name = $"Player {playerNumber} camera";
+        playerCamera = Instantiate(CameraPrefab, GameObject.Find("Cameras").transform);
+        playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
+        cameraOffset = transform.position - playerCamera.transform.position;
+        playerCamera.rect = new Rect(x, y, 0.5f, 0.5f);
+        playerCamera.name = $"Player {playerNumber} camera";
     }
 
     private void Die()

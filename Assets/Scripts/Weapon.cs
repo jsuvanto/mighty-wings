@@ -8,14 +8,25 @@ public abstract class Weapon : MonoBehaviour
     public WeaponType Type;
     public int Damage;
     public GameObject Ammunition;
-    public int ReloadTime;
+    public Vector2[] AmmunitionSpawnPoints;
+    
+    [Tooltip("Time to reload the magazine, in seconds")]
+    public float ReloadTime;
+    
+    [Tooltip("0 for infinite")]
     public int MagazineSize;
-    public int FireRate;
+    
+    [Tooltip("Time between shots in seconds")]
+    public float FireRate;
+    
+    [Tooltip("Initial force of ammunition, affects recoil")]
+    public float Force;
 
+    protected float lastFired;
 
-    public Weapon()
+    private void Start()
     {
-
+        lastFired = Time.time;
     }
 
     public virtual void Fire()
