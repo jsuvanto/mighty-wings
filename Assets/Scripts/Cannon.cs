@@ -17,6 +17,13 @@ public class Cannon : Weapon
     [Tooltip("Initial force of ammunition, affects recoil")]
     public float Force;
 
+    public ObjectPool ammoPool;
+
+    private void Start()
+    {
+        ammoPool = new ObjectPool(Ammunition, 100);
+    }
+
     public override void Fire()
     {
         
@@ -27,12 +34,14 @@ public class Cannon : Weapon
             lastFired = Time.time;
             var direction = transform.up;
 
-            var bullet = Instantiate(Ammunition); // TODO replace with object pooling
-            bullet.transform.position = transform.position;
-
-
-            bullet.GetComponent<Rigidbody2D>().velocity = gameObject.transform.parent.GetComponent<Rigidbody2D>().velocity;
-            bullet.GetComponent<Rigidbody2D>().AddForce(direction * Force);
+            var bullet = ammoPool.GetPooledObject();
+            if (bullet != null)
+            {
+                bullet.transform.position = transform.position;
+                bullet.GetComponent<Rigidbody2D>().velocity = gameObject.transform.parent.GetComponent<Rigidbody2D>().velocity;
+                bullet.GetComponent<Rigidbody2D>().AddForce(direction * Force);
+                bullet.SetActive(true);
+            }
 
             //Destroy(bulletClone, 3.0f); // TODO replace with object pooling
 

@@ -24,6 +24,8 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             collision.gameObject.GetComponent<PlayerController>().Damage(Damage);
+
+            Destroy(gameObject); // TODO replace with object pooling
         }
     }
 }
