@@ -39,18 +39,12 @@ public class PlayerController : MonoBehaviour
         if (fire > 0)
         {
             Weapon.Fire();
-            Recoil(Weapon.Force);
         }
 
         if (Health <= 0)
         {
             Die();
         }
-    }
-
-    private void Recoil(float force)
-    {
-        GetComponent<Rigidbody2D>().AddForce(-transform.up * force);
     }
 
     private void LateUpdate()
@@ -93,10 +87,12 @@ public class PlayerController : MonoBehaviour
     private void Die()
     {
         print($"Player {PlayerNumber} died");
+        Destroy(gameObject);
     }
 
     public void Damage(uint amount)
     {
         Health -= amount;
+        print($"Player {PlayerNumber} has {Health} health");
     }
 }
