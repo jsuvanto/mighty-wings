@@ -4,24 +4,19 @@ using UnityEngine;
 
 public class Cannon : Weapon
 {
-
-    [Tooltip("Time to reload the magazine, in seconds")]
-    public float ReloadTime;
-
-    [Tooltip("0 for infinite")]
-    public int MagazineSize;
-
     [Tooltip("Time between shots in seconds")]
-    public float FireRate;
+    public float TimeBetweenShots;
 
     [Tooltip("Initial force of ammunition, affects recoil")]
     public float Force;
 
-    public ObjectPool ammoPool;
+    public int AmmunitionPoolSize;
+
+    private GameObjectPool ammoPool;
 
     private void Start()
     {
-        ammoPool = new ObjectPool(Ammunition, 100);
+        ammoPool = new GameObjectPool(Ammunition, AmmunitionPoolSize);
     }
 
     public override void Fire()
@@ -29,7 +24,7 @@ public class Cannon : Weapon
         
         base.Fire();
 
-        if (Time.time > lastFired + FireRate)
+        if (Time.time > lastFired + TimeBetweenShots)
         {
             lastFired = Time.time;
             var direction = transform.up;
@@ -40,10 +35,7 @@ public class Cannon : Weapon
                 bullet.transform.position = transform.position;
                 bullet.GetComponent<Rigidbody2D>().velocity = gameObject.transform.parent.GetComponent<Rigidbody2D>().velocity;
                 bullet.GetComponent<Rigidbody2D>().AddForce(direction * Force);
-                bullet.SetActive(true);
             }
-
-            //Destroy(bulletClone, 3.0f); // TODO replace with object pooling
 
             Recoil();
         }

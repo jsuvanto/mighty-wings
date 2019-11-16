@@ -45,12 +45,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Cannon
   Type: 0
-  Damage: 5
   Ammunition: {fileID: 116481251940350783, guid: 6bf849e8b5f728a46ace26c0dd0a0623,
     type: 3}
   AmmunitionSpawnPoints:
   - {x: 0, y: 0.3}
-  ReloadTime: 3
-  MagazineSize: 100
-  FireRate: 1
-  Force: 5
+  TimeBetweenShots: 0.01
+  Force: 10
+  AmmunitionPoolSize: 20

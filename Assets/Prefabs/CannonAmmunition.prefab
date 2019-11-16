@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8544800911289586937}
   m_Layer: 0
   m_Name: CannonAmmunition
-  m_TagString: Untagged
+  m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -116,6 +116,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damage: 5
+  MinimumPenetrationImpulse: 0.06
 --- !u!58 &8544800911289586937
 CircleCollider2D:
   m_ObjectHideFlags: 0
