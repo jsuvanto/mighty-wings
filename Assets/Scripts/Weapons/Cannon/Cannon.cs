@@ -35,14 +35,13 @@ public class Cannon : Weapon
                 bullet.transform.position = transform.position;
                 bullet.GetComponent<Rigidbody2D>().velocity = gameObject.transform.parent.GetComponent<Rigidbody2D>().velocity;
                 bullet.GetComponent<Rigidbody2D>().AddForce(direction * Force);
-            }
-
-            Recoil();
+                Recoil();
+            }            
         }
     }
 
     public void Recoil()
     {
-        GetComponent<Rigidbody2D>().AddForce(-transform.up * Force);
+        GetComponentInParent<Rigidbody2D>().AddForce(-transform.up * Force);
     }
 }

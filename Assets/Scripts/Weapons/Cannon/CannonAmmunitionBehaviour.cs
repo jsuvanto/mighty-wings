@@ -12,13 +12,6 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
 
     private Vector2 velocity = new Vector2();
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void FixedUpdate()
     {
         velocity = GetComponent<Rigidbody2D>().velocity;
@@ -42,8 +35,16 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
                 result = "penetration";
                 collision.gameObject.GetComponent<PlayerController>().Damage(Damage);
                 gameObject.SetActive(false);
+                // TODO: add effect
             }
-            Debug.Log("angle: " + angleOfImpact + " impulse: " + impulse + " " + result);            
+            Debug.Log("angle: " + angleOfImpact + " impulse: " + impulse + " " + result);
+            
+        }
+        else if (collision.gameObject.tag == "Cave")
+        {            
+            gameObject.SetActive(false);
+            Debug.Log("hit cave");
+            // TODO: add effect
         }
     }
 }

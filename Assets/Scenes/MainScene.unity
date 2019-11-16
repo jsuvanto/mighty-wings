@@ -125,7 +125,7 @@ GameObject:
   - component: {fileID: 288422802}
   m_Layer: 0
   m_Name: Cave Mesh
-  m_TagString: Untagged
+  m_TagString: Cave
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -569,7 +569,7 @@ GameObject:
   - component: {fileID: 2121411495}
   m_Layer: 0
   m_Name: Map Generator
-  m_TagString: Untagged
+  m_TagString: Cave
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
