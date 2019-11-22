@@ -115,8 +115,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8b0d23228b610447a6139bfed4b820c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damage: 5
-  MinimumPenetrationImpulse: 0.06
+  Damage: 10
+  MinimumPenetrationImpulse: 0.05
 --- !u!58 &8544800911289586937
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -588,11 +588,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Width: 128
   Height: 72
-  RandomFillPercentage: 30
+  RandomFillPercentage: 48
   BorderThickness: 1
   SmoothingCount: 5
   Seed: jsuv
-  UseRandomSeed: 0
+  UseRandomSeed: 1
   MinimumRegionSize: 50
   RemoveSmallRegions: 1
   PassageWidth: 5

@@ -147,7 +147,7 @@ MonoBehaviour:
   Health: 100
   Lives: 0
   ThrottleForce: 50
-  SteeringSpeed: 10
+  SteeringSpeed: 5
   CameraPrefab: {fileID: 5672277640034418320, guid: 3bf9d29c04cd2764b90acf4869da439b,
     type: 3}
   Weapon: {fileID: 0}

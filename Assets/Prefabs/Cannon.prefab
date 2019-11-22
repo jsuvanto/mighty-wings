@@ -49,6 +49,6 @@ MonoBehaviour:
     type: 3}
   AmmunitionSpawnPoints:
   - {x: 0, y: 0.3}
-  TimeBetweenShots: 0.01
+  TimeBetweenShots: 0.1
   Force: 10
-  AmmunitionPoolSize: 20
+  AmmunitionPoolSize: 50
