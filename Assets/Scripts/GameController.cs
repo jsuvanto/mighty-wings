@@ -11,7 +11,7 @@ public class GameController : MonoBehaviour
     public GameObject PlayerShip;
     public Weapon[] Weapons;
 
-    public Canvas PlayerUi;
+    public Canvas PlayerHud;
     public Camera PlayerCamera;
 
     void Start()
@@ -24,8 +24,9 @@ public class GameController : MonoBehaviour
         for (uint playerNumber = 1; playerNumber <= NumberOfPlayers; playerNumber++)
         {
             var playerShip = CreatePlayerShip(playerNumber);
-            var camera = CreatePlayerCamera(playerNumber, playerShip);
-            CreatePlayerUi(camera);            
+            var playerCamera = CreatePlayerCamera(playerNumber);
+            playerShip.GetComponent<PlayerController>().Camera = playerCamera;
+            CreatePlayerHud(playerCamera, playerNumber);
         }
     }
 
@@ -41,7 +42,7 @@ public class GameController : MonoBehaviour
         return playerShip;
     }
 
-    private Camera CreatePlayerCamera(uint playerNumber, GameObject playerShip)
+    private Camera CreatePlayerCamera(uint playerNumber)
     {
         float x = playerNumber % 2 == 0 ? 0.5f : 0;
         float y = playerNumber < 3 ? 0.5f : 0;
@@ -49,16 +50,15 @@ public class GameController : MonoBehaviour
         playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
         playerCamera.rect = new Rect(x, y, 0.5f, 0.5f);
         playerCamera.name = $"Player {playerNumber} camera";
-
-        playerShip.GetComponent<PlayerController>().Camera = playerCamera;
         return playerCamera;
     }
 
-    private void CreatePlayerUi(Camera playerCamera)
+    private void CreatePlayerHud(Camera playerCamera, uint playerNumber)
     {
-        var playerUi = Instantiate(PlayerUi);
-        playerUi.renderMode = RenderMode.ScreenSpaceCamera;
-        playerUi.worldCamera = playerCamera;
-        playerUi.planeDistance = 1;
+        var playerHud = Instantiate(PlayerHud);
+        playerHud.renderMode = RenderMode.ScreenSpaceCamera;
+        playerHud.worldCamera = playerCamera;
+        playerHud.planeDistance = 1;
+        playerHud.name = $"Player {playerNumber} HUD";
     }
 }
