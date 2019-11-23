@@ -14,16 +14,16 @@ public class PlayerController : MonoBehaviour
 
     public uint ThrottleForce;
     public uint SteeringSpeed;
-    public Camera CameraPrefab;
     public Weapon Weapon;
 
     private Rigidbody2D body;
-    private Camera playerCamera;
+    public Camera Camera;
     private Vector3 cameraOffset;
     
     void Start()
     {
-        body = GetComponent<Rigidbody2D>();    
+        body = GetComponent<Rigidbody2D>();
+        cameraOffset = transform.position - Camera.transform.position;
     }
 
     private void FixedUpdate()
@@ -49,7 +49,7 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        playerCamera.transform.position = transform.position - cameraOffset;       
+        Camera.transform.position = transform.position - cameraOffset;       
     }
 
     public void Initialize(uint playerNumber)
@@ -74,14 +74,6 @@ public class PlayerController : MonoBehaviour
                 spriteRenderer.color = Color.yellow;
                 break;
         }
-
-        float x = playerNumber % 2 == 0 ? 0.5f : 0;
-        float y = playerNumber < 3 ? 0.5f : 0;
-        playerCamera = Instantiate(CameraPrefab, GameObject.Find("Cameras").transform);
-        playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
-        cameraOffset = transform.position - playerCamera.transform.position;
-        playerCamera.rect = new Rect(x, y, 0.5f, 0.5f);
-        playerCamera.name = $"Player {playerNumber} camera";
     }
 
     private void Die()
