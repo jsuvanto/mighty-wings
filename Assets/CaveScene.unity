@@ -585,12 +585,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a3260593875d6a429104c7177142a94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NumberOfPlayers: 4
+  NumberOfPlayers: 1
   PlayerShip: {fileID: 2023796972455111720, guid: f41f0eb495352b44f950b31ec33b1e5c,
     type: 3}
   Weapons:
   - {fileID: 5031613579643523798, guid: 389e2c986a85df549804b2ae3089467e, type: 3}
-  PlayerUi: {fileID: 3127981965867307565, guid: 6c3ed4179febd1a43a2e18e4957b9aaf,
+  PlayerHud: {fileID: 3127981965867307565, guid: 6c3ed4179febd1a43a2e18e4957b9aaf,
     type: 3}
   PlayerCamera: {fileID: 5672277640034418320, guid: 3bf9d29c04cd2764b90acf4869da439b,
     type: 3}
@@ -658,7 +658,7 @@ MonoBehaviour:
   Width: 128
   Height: 72
   RandomFillPercentage: 30
-  BorderThickness: 1
+  BorderThickness: 6
   SmoothingCount: 5
   Seed: jsuv
   UseRandomSeed: 0
