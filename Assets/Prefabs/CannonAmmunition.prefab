@@ -116,7 +116,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damage: 10
-  MinimumPenetrationImpulse: 0.05
+  MinimumPenetrationImpulse: 0.1
 --- !u!58 &8544800911289586937
 CircleCollider2D:
   m_ObjectHideFlags: 0
