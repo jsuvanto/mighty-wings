@@ -58,7 +58,7 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        Camera.transform.position = transform.position - cameraOffset;       
+        Camera.transform.position = transform.position - cameraOffset;
     }
 
     public void Initialize(uint playerNumber)

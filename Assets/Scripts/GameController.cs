@@ -36,6 +36,7 @@ public class GameController : MonoBehaviour
         {
             var playerShip = CreatePlayerShip(playerNumber);
             var playerCamera = CreatePlayerCamera(playerNumber);
+            playerCamera.transform.position = playerShip.transform.position - new Vector3(0, 0, 10);
             playerShip.GetComponent<PlayerController>().Camera = playerCamera;
             CreatePlayerHud(playerCamera, playerNumber);
         }
@@ -68,7 +69,6 @@ public class GameController : MonoBehaviour
         float x = playerNumber % 2 == 0 ? 0.5f : 0;
         float y = playerNumber < 3 ? 0.5f : 0;
         var playerCamera = Instantiate(PlayerCamera, GameObject.Find("Cameras").transform);
-        playerCamera.transform.position = new Vector3(transform.position.x, transform.position.y, -10);
         playerCamera.rect = new Rect(x, y, 0.5f, 0.5f);
         playerCamera.name = $"Player {playerNumber} camera";
         return playerCamera;
