@@ -16,6 +16,8 @@ public class PlayerController : MonoBehaviour
     public uint SteeringSpeed;
     public Weapon Weapon;
 
+    public GameObject DeathEffect;
+
     private Rigidbody2D body;
     public Camera Camera;
     private Vector3 cameraOffset;
@@ -86,6 +88,7 @@ public class PlayerController : MonoBehaviour
     private void Die()
     {
         print($"Player {PlayerNumber} died");
+        Instantiate(DeathEffect, transform.position, new Quaternion());
         Destroy(gameObject);
     }
 
