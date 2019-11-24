@@ -14,10 +14,21 @@ public class GameController : MonoBehaviour
     public Canvas PlayerHud;
     public Camera PlayerCamera;
 
+    [Range(0, 100)]
+    public uint PlayerHealth;
+    [Range(0, 100)]
+    public uint PlayerLives;
+
+    private Dictionary<PlayerController, int> playerScores;
+    private Dictionary<PlayerController, uint> playerLives;
+    private Dictionary<PlayerController, uint> playerHealths;
+
+    
+
     void Start()
     {
 
-        // start menu
+        // TODO: start menu
 
         Camera.main.enabled = false;
 
@@ -28,6 +39,16 @@ public class GameController : MonoBehaviour
             playerShip.GetComponent<PlayerController>().Camera = playerCamera;
             CreatePlayerHud(playerCamera, playerNumber);
         }
+    }
+
+    private void LateUpdate()
+    {
+        // TODO: update healths
+        // TODO: update lives
+        // TODO: kill dead players
+        // TODO: update score
+        // TODO: display victory screen
+
     }
 
 

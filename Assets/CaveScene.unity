@@ -585,7 +585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a3260593875d6a429104c7177142a94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NumberOfPlayers: 1
+  NumberOfPlayers: 4
   PlayerShip: {fileID: 2023796972455111720, guid: f41f0eb495352b44f950b31ec33b1e5c,
     type: 3}
   Weapons:
@@ -594,6 +594,8 @@ MonoBehaviour:
     type: 3}
   PlayerCamera: {fileID: 5672277640034418320, guid: 3bf9d29c04cd2764b90acf4869da439b,
     type: 3}
+  PlayerHealth: 100
+  PlayerLives: 5
 --- !u!1 &2090375249
 GameObject:
   m_ObjectHideFlags: 0
@@ -657,7 +659,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Width: 128
   Height: 72
-  RandomFillPercentage: 30
+  RandomFillPercentage: 53
   BorderThickness: 6
   SmoothingCount: 5
   Seed: jsuv

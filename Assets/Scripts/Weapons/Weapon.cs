@@ -7,7 +7,6 @@ public abstract class Weapon : MonoBehaviour
     public string Name;
     public WeaponType Type;
     public GameObject Ammunition;
-    public Vector2[] AmmunitionSpawnPoints;
 
     protected float lastFired;
 

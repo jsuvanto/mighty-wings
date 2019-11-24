@@ -10,41 +10,35 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
     [Tooltip("Minimum impulse required to penetrate a player ship")]
     public float MinimumPenetrationImpulse;
 
-    private Vector2 velocity = new Vector2();
-
-    void FixedUpdate()
-    {
-        velocity = GetComponent<Rigidbody2D>().velocity;
-    }
+    public GameObject PenetrationEffect;
+    public GameObject WallCollisionEffect;
+    public GameObject RicochetEffect;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Player")
         {
-            var normal = collision.GetContact(0).normal;
-            var impulse = collision.GetContact(0).normalImpulse;
-
-            var result = "deflected";
-
-            Debug.Log("velocity: " + velocity.ToString() + " normal : " + normal.ToString());
-
-            var angleOfImpact = Vector2.Angle(velocity, -normal);
+            var impulse = collision.GetContact(0).normalImpulse; // TODO: replace with average, min, max or other characteristic value for impulse
 
             if (impulse > MinimumPenetrationImpulse)
             {
-                result = "penetration";
                 collision.gameObject.GetComponent<PlayerController>().Damage(Damage);
                 gameObject.SetActive(false);
-                // TODO: add effect
+                //Instantiate(PenetrationEffect, collision.transform);
+                // TODO: sfx
             }
-            Debug.Log("angle: " + angleOfImpact + " impulse: " + impulse + " " + result);
-            
+            else
+            {
+              //  Instantiate(RicochetEffect, collision.transform);
+                // TODO: sfx
+            }
         }
         else if (collision.gameObject.tag == "Cave")
         {            
             gameObject.SetActive(false);
             Debug.Log("hit cave");
-            // TODO: add effect
+         //   Instantiate(WallCollisionEffect, collision.transform);
+            // TODO: sfx
         }
     }
 }

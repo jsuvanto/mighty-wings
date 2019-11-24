@@ -11,12 +11,13 @@ public class Cannon : Weapon
     public float Force;
 
     public int AmmunitionPoolSize;
-
     private GameObjectPool ammoPool;
+    private ParticleSystem fireEffect;
 
     private void Start()
     {
         ammoPool = new GameObjectPool(Ammunition, AmmunitionPoolSize);
+        fireEffect = GetComponent<ParticleSystem>();
     }
 
     public override void Fire()
@@ -36,6 +37,7 @@ public class Cannon : Weapon
                 bullet.GetComponent<Rigidbody2D>().velocity = gameObject.transform.parent.GetComponent<Rigidbody2D>().velocity;
                 bullet.GetComponent<Rigidbody2D>().AddForce(direction * Force);
                 Recoil();
+                fireEffect.Play();
             }            
         }
     }
