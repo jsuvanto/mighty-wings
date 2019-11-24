@@ -19,11 +19,15 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D body;
     public Camera Camera;
     private Vector3 cameraOffset;
+    private ParticleSystem rocketTrail;
+    private float emissionRate;
     
     void Start()
     {
         body = GetComponent<Rigidbody2D>();
         cameraOffset = transform.position - Camera.transform.position;
+        rocketTrail = GetComponent<ParticleSystem>();
+        emissionRate = rocketTrail.emission.rateOverTimeMultiplier;
     }
 
     private void FixedUpdate()
@@ -33,6 +37,9 @@ public class PlayerController : MonoBehaviour
         float steering = Input.GetAxis($"Player {PlayerNumber} Steering");
         body.AddForce(throttle * ThrottleForce * body.transform.up);
         body.transform.Rotate(steering * SteeringSpeed * Vector3.forward);
+
+        var emission = rocketTrail.emission;
+        emission.rateOverTimeMultiplier = throttle * emissionRate;
 
 
         float fire = Input.GetAxis($"Player {PlayerNumber} Fire");
