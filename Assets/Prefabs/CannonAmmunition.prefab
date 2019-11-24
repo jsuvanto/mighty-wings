@@ -117,11 +117,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Damage: 10
   MinimumPenetrationImpulse: 0.1
-  PenetrationParticle: {fileID: 7944567250589116283, guid: 85daba76fc2e32d4986f55c82b480f8a,
+  PenetrationEffect: {fileID: 527366147964176609, guid: 85daba76fc2e32d4986f55c82b480f8a,
     type: 3}
-  WallCollisionParticle: {fileID: 6230454214482536515, guid: da2e1509947ac0b4cac0d36c64412cde,
+  WallCollisionEffect: {fileID: 4764742120606241792, guid: da2e1509947ac0b4cac0d36c64412cde,
     type: 3}
-  RicochetParticle: {fileID: 8842168449243938374, guid: 247a8ae88fafb44488107c9e7a5e0bab,
+  RicochetEffect: {fileID: 3599373416791659352, guid: 247a8ae88fafb44488107c9e7a5e0bab,
     type: 3}
 --- !u!58 &8544800911289586937
 CircleCollider2D:

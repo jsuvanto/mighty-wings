@@ -11,25 +11,24 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
     public float MinimumPenetrationImpulse;
 
     public GameObject PenetrationEffect;
-    public GameObject WallCollisionEffect;
-    public GameObject RicochetEffect;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Player")
         {
-            var impulse = collision.GetContact(0).normalImpulse; // TODO: replace with average, min, max or other characteristic value for impulse
+            var contact = collision.GetContact(0);
+            var impulse = contact.normalImpulse; // TODO: replace with average, min, max or other characteristic value for impulse
 
             if (impulse > MinimumPenetrationImpulse)
             {
                 collision.gameObject.GetComponent<PlayerController>().Damage(Damage);
                 gameObject.SetActive(false);
-                //Instantiate(PenetrationEffect, collision.transform);
+                var normal = contact.normal;
+                Instantiate(PenetrationEffect, transform.position, Quaternion.LookRotation(normal));
                 // TODO: sfx
             }
             else
             {
-              //  Instantiate(RicochetEffect, collision.transform);
                 // TODO: sfx
             }
         }
@@ -37,7 +36,6 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
         {            
             gameObject.SetActive(false);
             Debug.Log("hit cave");
-         //   Instantiate(WallCollisionEffect, collision.transform);
             // TODO: sfx
         }
     }
