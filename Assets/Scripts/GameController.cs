@@ -23,12 +23,10 @@ public class GameController : MonoBehaviour
 
     private List<PlayerController> players;
 
-    void Start()
+    void Awake()
     {
         players = new List<PlayerController>();
-
-        // TODO: start menu
-
+        
         Camera.main.enabled = false;
 
         for (uint playerNumber = 1; playerNumber <= NumberOfPlayers; playerNumber++)
@@ -117,5 +115,10 @@ public class GameController : MonoBehaviour
         playerHud.planeDistance = 1;
         playerHud.name = $"Player {playerNumber} HUD";
         return playerHud;
+    }
+
+    public void SetPlayerCount(float number)
+    {
+        
     }
 }

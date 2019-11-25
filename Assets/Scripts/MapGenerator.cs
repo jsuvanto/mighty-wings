@@ -28,20 +28,12 @@ public class MapGenerator : MonoBehaviour
     
     public bool DrawGizmos = true;
 
-    void Start()
+    private void Start()
     {
         GenerateCave();
     }
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            GenerateCave();
-        }
-    }
-
-    private void GenerateCave()
+    public void GenerateCave()
     {
         cave = new Cave(Width, Height, RandomFillPercentage, BorderThickness);
 
@@ -77,7 +69,7 @@ public class MapGenerator : MonoBehaviour
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    switch (cave.Tiles[x,y])
+                    switch (cave.Tiles[x, y])
                     {
                         case CaveTile.Wall:
                             Gizmos.color = Color.black;
