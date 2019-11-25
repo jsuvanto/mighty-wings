@@ -18,6 +18,8 @@ public class Cannon : Weapon
     {
         ammoPool = new GameObjectPool(Ammunition, AmmunitionPoolSize);
         fireEffect = GetComponent<ParticleSystem>();
+        var m = fireEffect.main;
+        m.playOnAwake = false;
     }
 
     public override void Fire()
