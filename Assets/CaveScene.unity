@@ -596,6 +596,7 @@ MonoBehaviour:
     type: 3}
   PlayerHealth: 100
   PlayerLives: 5
+  RespawnTime: 5
 --- !u!1 &2090375249
 GameObject:
   m_ObjectHideFlags: 0

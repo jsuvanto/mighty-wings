@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
@@ -13,20 +14,18 @@ public class GameController : MonoBehaviour
 
     public Canvas PlayerHud;
     public Camera PlayerCamera;
-
-    [Range(0, 100)]
+    
     public uint PlayerHealth;
-    [Range(0, 100)]
     public uint PlayerLives;
 
-    private Dictionary<PlayerController, int> playerScores;
-    private Dictionary<PlayerController, uint> playerLives;
-    private Dictionary<PlayerController, uint> playerHealths;
+    [Tooltip("Respawn time after death in seconds")]
+    public uint RespawnTime;
 
-    
+    private List<PlayerController> players;
 
     void Start()
     {
+        players = new List<PlayerController>();
 
         // TODO: start menu
 
@@ -35,20 +34,48 @@ public class GameController : MonoBehaviour
         for (uint playerNumber = 1; playerNumber <= NumberOfPlayers; playerNumber++)
         {
             var playerShip = CreatePlayerShip(playerNumber);
+            var playerController = playerShip.GetComponent<PlayerController>();
+            
             var playerCamera = CreatePlayerCamera(playerNumber);
             playerCamera.transform.position = playerShip.transform.position - new Vector3(0, 0, 10);
             playerShip.GetComponent<PlayerController>().Camera = playerCamera;
-            CreatePlayerHud(playerCamera, playerNumber);
+            var playerHud = CreatePlayerHud(playerCamera, playerNumber);
+            playerHud.transform.SetParent(playerCamera.transform);
+
+            playerController.Camera = playerCamera;
+            playerController.Hud = playerHud;
+            playerController.Health = PlayerHealth;
+            playerController.Lives = PlayerLives;
+            
+            players.Add(playerController);
         }
     }
 
     private void LateUpdate()
     {
-        // TODO: update healths
-        // TODO: update lives
-        // TODO: kill dead players
-        // TODO: update score
-        // TODO: display victory screen
+
+        foreach (var player in players)
+        {
+            player.LivesText.text = player.Lives.ToString();
+            player.HealthText.text = player.Health.ToString();
+
+            if (player.Lives == 0) continue;
+
+            if (!player.isActiveAndEnabled && player.TimeOfDeath + RespawnTime < Time.time)
+            {
+                player.gameObject.transform.position = RandomLocation(player.PlayerNumber);
+                player.Health = PlayerHealth;
+                player.gameObject.SetActive(true);
+            }
+
+            // TODO: update score
+        }
+
+        if (players.Where(p => p.Lives > 0).Count() == 1)
+        {
+            print(players.Single(p => p.Lives > 0).PlayerNumber + " wins");
+            // TODO: change to victory screen
+        }
 
     }
 
@@ -57,11 +84,19 @@ public class GameController : MonoBehaviour
     private GameObject CreatePlayerShip(uint playerNumber)
     {
         print($"Spawning player {playerNumber}");
-        GameObject playerShip = Instantiate(PlayerShip, new Vector3(playerNumber, 0, 1), new Quaternion());
+        GameObject playerShip = Instantiate(PlayerShip, RandomLocation(playerNumber), new Quaternion());        
         var playerController = playerShip.GetComponent<PlayerController>();
         playerController.Weapon = Instantiate(Weapons[0], playerShip.transform);
         playerController.Initialize(playerNumber);
+        playerController.Health = PlayerHealth;
+        playerController.Lives = PlayerLives;
         return playerShip;
+    }
+
+    private Vector3 RandomLocation(uint playerNumber)
+    {
+        // TODO: implement properly
+        return new Vector3(playerNumber, 0, 1);
     }
 
     private Camera CreatePlayerCamera(uint playerNumber)
@@ -74,12 +109,13 @@ public class GameController : MonoBehaviour
         return playerCamera;
     }
 
-    private void CreatePlayerHud(Camera playerCamera, uint playerNumber)
+    private Canvas CreatePlayerHud(Camera playerCamera, uint playerNumber)
     {
         var playerHud = Instantiate(PlayerHud);
         playerHud.renderMode = RenderMode.ScreenSpaceCamera;
         playerHud.worldCamera = playerCamera;
         playerHud.planeDistance = 1;
         playerHud.name = $"Player {playerNumber} HUD";
+        return playerHud;
     }
 }

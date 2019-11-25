@@ -2,27 +2,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    [HideInInspector]
-    public uint PlayerNumber;
-    [Range(0,100)]
-    public uint Health;
-    [Range(0, 100)]
-    public uint Lives;
 
     public uint ThrottleForce;
     public uint SteeringSpeed;
-    public Weapon Weapon;
-
     public GameObject DeathEffect;
 
-    private Rigidbody2D body;
+    [HideInInspector]
+    public uint PlayerNumber;
+    [HideInInspector]
+    public uint Health;
+    [HideInInspector]
+    public uint Lives;
+    [HideInInspector]
+    public Weapon Weapon;
+    [HideInInspector]
     public Camera Camera;
+    [HideInInspector]
+    public Canvas Hud;
+
+
+    private Rigidbody2D body;
     private Vector3 cameraOffset;
     private ParticleSystem rocketTrail;
     private float emissionRate;
+
+    [HideInInspector]
+    public Text HealthText;
+    [HideInInspector]
+    public Text LivesText;
+    [HideInInspector]
+    public float TimeOfDeath;
     
     void Start()
     {
@@ -30,6 +43,9 @@ public class PlayerController : MonoBehaviour
         cameraOffset = transform.position - Camera.transform.position;
         rocketTrail = GetComponent<ParticleSystem>();
         emissionRate = rocketTrail.emission.rateOverTimeMultiplier;
+
+        HealthText = Camera.GetComponentsInChildren<Text>()[0];
+        LivesText = Camera.GetComponentsInChildren<Text>()[1];
     }
 
     private void FixedUpdate()
@@ -89,12 +105,13 @@ public class PlayerController : MonoBehaviour
     {
         print($"Player {PlayerNumber} died");
         Instantiate(DeathEffect, transform.position, new Quaternion());
-        Destroy(gameObject);
+        TimeOfDeath = Time.time;
+        Lives -= 1;
+        gameObject.SetActive(false);
     }
 
     public void Damage(uint amount)
     {
         Health -= amount;
-        print($"Player {PlayerNumber} has {Health} health");
     }
 }
