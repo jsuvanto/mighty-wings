@@ -3119,7 +3119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a3260593875d6a429104c7177142a94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NumberOfPlayers: 2
+  NumberOfPlayers: 4
   PlayerShip: {fileID: 2023796972455111720, guid: f41f0eb495352b44f950b31ec33b1e5c,
     type: 3}
   Weapons:
@@ -3129,7 +3129,7 @@ MonoBehaviour:
   PlayerCamera: {fileID: 5672277640034418320, guid: 3bf9d29c04cd2764b90acf4869da439b,
     type: 3}
   PlayerHealth: 100
-  PlayerLives: 1
+  PlayerLives: 5
   RespawnTime: 2
   MenuController: {fileID: 909149366}
   MainCamera: {fileID: 708237749}
