@@ -2,26 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameObjectPool
+public class GameObjectPool: MonoBehaviour
 {
+    public static GameObjectPool SharedInstance;
+
+
     private List<GameObject> pool;
     public GameObject GameObject;
     public int PoolSize;
-
-    
-    public GameObjectPool(GameObject gameObject, int poolSize)
+    private void Awake()
     {
-        GameObject = gameObject;
-        PoolSize = poolSize;
+        SharedInstance = this;
+    }
 
+    private void Start()
+    {
         pool = new List<GameObject>(PoolSize);
         for (int i = 0; i < PoolSize; i++)
         {
-            GameObject obj = Object.Instantiate(GameObject);
+            GameObject obj = Instantiate(GameObject);
             obj.SetActive(false);
             pool.Add(obj);
         }
     }
+
 
     public GameObject GetPooledObject()
     {

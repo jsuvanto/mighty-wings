@@ -16,7 +16,7 @@ public class Cannon : Weapon
 
     private void Start()
     {
-        ammoPool = new GameObjectPool(Ammunition, AmmunitionPoolSize);
+        ammoPool = GameObjectPool.SharedInstance;
         fireEffect = GetComponent<ParticleSystem>();
         var m = fireEffect.main;
         m.playOnAwake = false;
