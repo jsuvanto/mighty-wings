@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 50390294613847792}
   - component: {fileID: 5500990805556699225}
   - component: {fileID: 8544800911289586937}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: CannonAmmunition
   m_TagString: Projectile
   m_Icon: {fileID: 0}
