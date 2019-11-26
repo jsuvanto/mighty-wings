@@ -24,6 +24,7 @@ public class GameController : MonoBehaviour
     private List<PlayerController> players = new List<PlayerController>();
 
     private bool isPaused = false;
+    private bool isRunning = false;
 
     public GameObject MenuController;
     private MenuController menuController;
@@ -57,39 +58,43 @@ public class GameController : MonoBehaviour
             players.Add(playerController);
         }
         isPaused = false;
+        isRunning = true;
         Time.timeScale = 1;
     }
 
     private void LateUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (isRunning)
         {
-            TogglePauseGame();
-        }
-
-        foreach (var player in players)
-        {
-            player.LivesText.text = player.Lives.ToString();
-            player.HealthText.text = player.Health.ToString();
-
-            if (player.Lives == 0) continue;
-
-            if (!player.isActiveAndEnabled && player.TimeOfDeath + RespawnTime < Time.time)
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
-                player.gameObject.transform.position = RandomLocation(player.PlayerNumber);
-                player.Health = PlayerHealth;
-                player.gameObject.SetActive(true);
+                TogglePauseGame();
             }
 
-            // TODO: update score
-        }
+            foreach (var player in players)
+            {
+                player.LivesText.text = player.Lives.ToString();
+                player.HealthText.text = player.Health.ToString();
 
-        if (players.Where(p => p.Lives > 0).Count() == 1)
-        {
-            var winner = players.Single(p => p.Lives > 0).PlayerNumber;
-            // TODO: change to victory screen
-            DeclareWinner(winner);
-        }   
+                if (player.Lives == 0) continue;
+
+                if (!player.isActiveAndEnabled && player.TimeOfDeath + RespawnTime < Time.time)
+                {
+                    player.gameObject.transform.position = RandomLocation(player.PlayerNumber);
+                    player.Health = PlayerHealth;
+                    player.gameObject.SetActive(true);
+                }
+
+                // TODO: update score
+            }
+
+            if (players.Where(p => p.Lives > 0).Count() == 1)
+            {
+                var winner = players.Single(p => p.Lives > 0).PlayerNumber;
+                // TODO: change to victory screen
+                DeclareWinner(winner);
+            }
+        }
     }
 
     private GameObject CreatePlayerShip(uint playerNumber)
@@ -138,14 +143,12 @@ public class GameController : MonoBehaviour
     {
         if (isPaused)
         {
-            print("unpausing game");
             menuController.TogglePauseMenu();
             isPaused = false;
             Time.timeScale = 1;
         }
         else
         {
-            print("pausing game");
             menuController.TogglePauseMenu();
             isPaused = true;
             Time.timeScale = 0;
@@ -154,8 +157,9 @@ public class GameController : MonoBehaviour
 
     private void DeclareWinner(uint winner)
     {
-        Time.timeScale = 0;
-        menuController.ShowVictoryScreen(winner);
+        isRunning = false;
+        menuController.ShowVictoryMenu(winner);
+        // TODO: disable controls
     }
 
 
