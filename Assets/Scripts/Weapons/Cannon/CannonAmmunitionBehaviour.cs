@@ -28,14 +28,13 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
                 // TODO: sfx
             }
             else
-            {
+            {                
                 // TODO: sfx
             }
         }
         else if (collision.gameObject.tag == "Cave")
         {            
             gameObject.SetActive(false);
-            Debug.Log("hit cave");
             // TODO: sfx
         }
     }
