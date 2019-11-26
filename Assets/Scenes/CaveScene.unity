@@ -3642,7 +3642,7 @@ MonoBehaviour:
   SmoothingCount: 5
   Seed: jsuv
   UseRandomSeed: 1
-  MinimumRegionSize: 50
+  MinimumRegionSize: 40
   RemoveSmallRegions: 1
   PassageWidth: 5
   ConnectAllRooms: 1
