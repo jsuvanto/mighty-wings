@@ -57,8 +57,8 @@ InputManager:
     m_Name: Player 2 Throttle
     descriptiveName: 
     descriptiveNegativeName: 
-    negativeButton: k
-    positiveButton: i
+    negativeButton: down
+    positiveButton: up
     altNegativeButton: 
     altPositiveButton: 
     gravity: 1000
@@ -73,8 +73,8 @@ InputManager:
     m_Name: Player 2 Steering
     descriptiveName: 
     descriptiveNegativeName: 
-    negativeButton: l
-    positiveButton: j
+    negativeButton: right
+    positiveButton: left
     altNegativeButton: 
     altPositiveButton: 
     gravity: 1000
@@ -90,7 +90,7 @@ InputManager:
     descriptiveName: 
     descriptiveNegativeName: 
     negativeButton: 
-    positiveButton: space
+    positiveButton: right ctrl
     altNegativeButton: 
     altPositiveButton: joystick 2 button 0
     gravity: 1000
@@ -105,8 +105,8 @@ InputManager:
     m_Name: Player 3 Throttle
     descriptiveName: 
     descriptiveNegativeName: 
-    negativeButton: down
-    positiveButton: up
+    negativeButton: k
+    positiveButton: i
     altNegativeButton: 
     altPositiveButton: 
     gravity: 1000
@@ -121,8 +121,8 @@ InputManager:
     m_Name: Player 3 Steering
     descriptiveName: 
     descriptiveNegativeName: 
-    negativeButton: right
-    positiveButton: left
+    negativeButton: l
+    positiveButton: j
     altNegativeButton: 
     altPositiveButton: 
     gravity: 1000
@@ -138,7 +138,7 @@ InputManager:
     descriptiveName: 
     descriptiveNegativeName: 
     negativeButton: 
-    positiveButton: right ctrl
+    positiveButton: space
     altNegativeButton: 
     altPositiveButton: joystick 3 button 0
     gravity: 1000
