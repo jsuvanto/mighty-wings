@@ -3133,6 +3133,7 @@ MonoBehaviour:
   RespawnTime: 2
   MenuController: {fileID: 909149366}
   MainCamera: {fileID: 708237749}
+  MapGenerator: {fileID: 2121411493}
 --- !u!1 &1891104133
 GameObject:
   m_ObjectHideFlags: 0
@@ -3683,7 +3684,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Width: 128
   Height: 72
-  RandomFillPercentage: 53
+  RandomFillPercentage: 47
   BorderThickness: 10
   SmoothingCount: 5
   Seed: jsuv

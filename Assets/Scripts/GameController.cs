@@ -21,7 +21,7 @@ public class GameController : MonoBehaviour
     [Tooltip("Respawn time after death in seconds")]
     public uint RespawnTime;
 
-    private List<PlayerController> players = new List<PlayerController>();
+    readonly private List<PlayerController> players = new List<PlayerController>();
 
     private bool isPaused = false;
     private bool isRunning = false;
@@ -29,6 +29,8 @@ public class GameController : MonoBehaviour
     public GameObject MenuController;
     private MenuController menuController;
     public Camera MainCamera;
+
+    public MapGenerator MapGenerator;
 
     private void Start()
     {
@@ -80,7 +82,7 @@ public class GameController : MonoBehaviour
 
                 if (!player.isActiveAndEnabled && player.TimeOfDeath + RespawnTime < Time.time)
                 {
-                    player.gameObject.transform.position = RandomLocation(player.PlayerNumber);
+                    player.gameObject.transform.position = RandomSpawnLocation();
                     player.Health = PlayerHealth;
                     player.gameObject.SetActive(true);
                 }
@@ -99,7 +101,7 @@ public class GameController : MonoBehaviour
 
     private GameObject CreatePlayerShip(uint playerNumber)
     {
-        GameObject playerShip = Instantiate(PlayerShip, RandomLocation(playerNumber), new Quaternion());        
+        GameObject playerShip = Instantiate(PlayerShip, RandomSpawnLocation(), new Quaternion());        
         var playerController = playerShip.GetComponent<PlayerController>();
         playerController.Weapon = Instantiate(Weapons[0], playerShip.transform);
         playerController.Initialize(playerNumber);
@@ -108,10 +110,9 @@ public class GameController : MonoBehaviour
         return playerShip;
     }
 
-    private Vector3 RandomLocation(uint playerNumber)
+    private Vector3 RandomSpawnLocation()
     {
-        // TODO: implement properly
-        return new Vector3(playerNumber, 0, 1);
+        return MapGenerator.RandomSpawnLocation();
     }
 
     private Camera CreatePlayerCamera(uint playerNumber)
