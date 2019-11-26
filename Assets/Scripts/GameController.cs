@@ -23,7 +23,10 @@ public class GameController : MonoBehaviour
 
     private List<PlayerController> players;
 
-    void Awake()
+    private bool isPaused = false;
+    private bool isRunning = false;
+
+    public void StartGame()
     {
         players = new List<PlayerController>();
         
@@ -47,36 +50,43 @@ public class GameController : MonoBehaviour
             
             players.Add(playerController);
         }
+
+        isRunning = true;
     }
 
     private void LateUpdate()
     {
-
-        foreach (var player in players)
+        if (isRunning)
         {
-            player.LivesText.text = player.Lives.ToString();
-            player.HealthText.text = player.Health.ToString();
-
-            if (player.Lives == 0) continue;
-
-            if (!player.isActiveAndEnabled && player.TimeOfDeath + RespawnTime < Time.time)
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
-                player.gameObject.transform.position = RandomLocation(player.PlayerNumber);
-                player.Health = PlayerHealth;
-                player.gameObject.SetActive(true);
+                TogglePauseGame();
             }
 
-            // TODO: update score
-        }
+            foreach (var player in players)
+            {
+                player.LivesText.text = player.Lives.ToString();
+                player.HealthText.text = player.Health.ToString();
 
-        if (players.Where(p => p.Lives > 0).Count() == 1)
-        {
-            print(players.Single(p => p.Lives > 0).PlayerNumber + " wins");
-            // TODO: change to victory screen
-        }
+                if (player.Lives == 0) continue;
 
+                if (!player.isActiveAndEnabled && player.TimeOfDeath + RespawnTime < Time.time)
+                {
+                    player.gameObject.transform.position = RandomLocation(player.PlayerNumber);
+                    player.Health = PlayerHealth;
+                    player.gameObject.SetActive(true);
+                }
+
+                // TODO: update score
+            }
+
+            if (players.Where(p => p.Lives > 0).Count() == 1)
+            {
+                print(players.Single(p => p.Lives > 0).PlayerNumber + " wins");
+                // TODO: change to victory screen
+            }
+        }
     }
-
 
 
     private GameObject CreatePlayerShip(uint playerNumber)
@@ -120,8 +130,20 @@ public class GameController : MonoBehaviour
         return playerHud;
     }
 
-    public void SetPlayerCount(float number)
+
+    private void TogglePauseGame()
     {
-        
+        if (isPaused)
+        {
+            print("unpausing game");
+            isPaused = false;
+            Time.timeScale = 1;
+        }
+        else
+        {
+            print("pausing game");
+            isPaused = true;
+            Time.timeScale = 0;
+        }
     }
 }
