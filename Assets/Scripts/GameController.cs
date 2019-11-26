@@ -25,10 +25,18 @@ public class GameController : MonoBehaviour
 
     private bool isPaused = false;
 
+    public GameObject MenuController;
+    private MenuController menuController;
+    public Camera MainCamera;
+
+    private void Start()
+    {
+        menuController = MenuController.GetComponent<MenuController>();
+    }
+
     public void StartGame()
     {
-        
-        Camera.main.enabled = false;
+        MainCamera.gameObject.SetActive(false);
 
         for (uint playerNumber = 1; playerNumber <= NumberOfPlayers; playerNumber++)
         {
@@ -48,6 +56,8 @@ public class GameController : MonoBehaviour
             
             players.Add(playerController);
         }
+        isPaused = false;
+        Time.timeScale = 1;
     }
 
     private void LateUpdate()
@@ -76,11 +86,11 @@ public class GameController : MonoBehaviour
 
         if (players.Where(p => p.Lives > 0).Count() == 1)
         {
-            print(players.Single(p => p.Lives > 0).PlayerNumber + " wins");
+            var winner = players.Single(p => p.Lives > 0).PlayerNumber;
             // TODO: change to victory screen
+            DeclareWinner(winner);
         }   
     }
-
 
     private GameObject CreatePlayerShip(uint playerNumber)
     {
@@ -124,19 +134,44 @@ public class GameController : MonoBehaviour
     }
 
 
-    private void TogglePauseGame()
+    public void TogglePauseGame()
     {
         if (isPaused)
         {
             print("unpausing game");
+            menuController.TogglePauseMenu();
             isPaused = false;
             Time.timeScale = 1;
         }
         else
         {
             print("pausing game");
+            menuController.TogglePauseMenu();
             isPaused = true;
             Time.timeScale = 0;
         }
+    }
+
+    private void DeclareWinner(uint winner)
+    {
+        Time.timeScale = 0;
+        menuController.ShowVictoryScreen(winner);
+    }
+
+
+    public void ResetGame()
+    {
+        Time.timeScale = 0;
+        MainCamera.gameObject.SetActive(true);
+
+        foreach (var player in players)
+        {
+            Destroy(player.Camera.gameObject);
+            Destroy(player.gameObject);
+
+            // TODO: remove ammo pools
+        }
+        players.Clear();
+        
     }
 }
