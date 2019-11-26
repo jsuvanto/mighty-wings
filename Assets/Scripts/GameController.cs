@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    [Range(1, 4)]
+    [Range(2, 4)]
     public uint NumberOfPlayers;
 
     public GameObject PlayerShip;
@@ -100,23 +100,9 @@ public class GameController : MonoBehaviour
     private Camera CreatePlayerCamera(uint playerNumber)
     {
         float x = playerNumber % 2 == 0 ? 0.5f : 0;
-        float y;
-        float width;
-        float height;
-
-        if (NumberOfPlayers == 2)
-        {
-            y = 0;
-            height = 1;
-            width = 0.5f;
-        }
-        else
-        {
-            y = playerNumber < 3 ? 0.5f : 0;
-            height = 0.5f;
-            width = playerNumber == 3 ? 1 : 0.5f;
-
-        }
+        float y = (NumberOfPlayers > 2 && playerNumber < 3) ? 0.5f : 0;
+        float width = (playerNumber == 3 && NumberOfPlayers == 3) ? 1 : 0.5f;
+        float height = NumberOfPlayers == 2 ? 1 : 0.5f;
 
         var playerCamera = Instantiate(PlayerCamera, GameObject.Find("Cameras").transform);
         playerCamera.rect = new Rect(x, y, width, height);
