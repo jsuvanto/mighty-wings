@@ -100,9 +100,26 @@ public class GameController : MonoBehaviour
     private Camera CreatePlayerCamera(uint playerNumber)
     {
         float x = playerNumber % 2 == 0 ? 0.5f : 0;
-        float y = playerNumber < 3 ? 0.5f : 0;
+        float y;
+        float width;
+        float height;
+
+        if (NumberOfPlayers == 2)
+        {
+            y = 0;
+            height = 1;
+            width = 0.5f;
+        }
+        else
+        {
+            y = playerNumber < 3 ? 0.5f : 0;
+            height = 0.5f;
+            width = playerNumber == 3 ? 1 : 0.5f;
+
+        }
+
         var playerCamera = Instantiate(PlayerCamera, GameObject.Find("Cameras").transform);
-        playerCamera.rect = new Rect(x, y, 0.5f, 0.5f);
+        playerCamera.rect = new Rect(x, y, width, height);
         playerCamera.name = $"Player {playerNumber} camera";
         return playerCamera;
     }

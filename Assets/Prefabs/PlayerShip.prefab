@@ -145,15 +145,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 706d717c01b44ae4e8529694459c7023, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ThrottleForce: 30
+  SteeringSpeed: 5
+  DeathEffect: {fileID: 1628942610110541432, guid: ecab29f4e5b3dfc41870d3fa365fe48d,
+    type: 3}
   PlayerNumber: 0
   Health: 100
   Lives: 0
-  ThrottleForce: 30
-  SteeringSpeed: 5
   Weapon: {fileID: 0}
-  DeathEffect: {fileID: 1628942610110541432, guid: ecab29f4e5b3dfc41870d3fa365fe48d,
-    type: 3}
   Camera: {fileID: 0}
+  Hud: {fileID: 0}
+  HealthText: {fileID: 0}
+  LivesText: {fileID: 0}
+  TimeOfDeath: 0
 --- !u!198 &7124233960801699837
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -782,7 +786,7 @@ ParticleSystem:
     serializedVersion: 6
     enabled: 1
     type: 4
-    angle: 0.00000028459124
+    angle: 0.1
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
