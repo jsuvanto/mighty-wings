@@ -3130,7 +3130,7 @@ MonoBehaviour:
     type: 3}
   PlayerHealth: 100
   PlayerLives: 5
-  RespawnTime: 2
+  RespawnTime: 5
   MenuController: {fileID: 909149366}
   MainCamera: {fileID: 708237749}
   MapGenerator: {fileID: 2121411493}
