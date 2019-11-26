@@ -99,7 +99,6 @@ public class GameController : MonoBehaviour
 
     private GameObject CreatePlayerShip(uint playerNumber)
     {
-        print($"Spawning player {playerNumber}");
         GameObject playerShip = Instantiate(PlayerShip, RandomLocation(playerNumber), new Quaternion());        
         var playerController = playerShip.GetComponent<PlayerController>();
         playerController.Weapon = Instantiate(Weapons[0], playerShip.transform);

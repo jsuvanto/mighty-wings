@@ -36,6 +36,8 @@ public class PlayerController : MonoBehaviour
     public Text LivesText;
     [HideInInspector]
     public float TimeOfDeath;
+
+    private AudioSource rocketSound;
     
     void Start()
     {
@@ -43,6 +45,7 @@ public class PlayerController : MonoBehaviour
         cameraOffset = transform.position - Camera.transform.position;
         rocketTrail = GetComponent<ParticleSystem>();
         emissionRate = rocketTrail.emission.rateOverTimeMultiplier;
+        rocketSound = GetComponent<AudioSource>();
 
         HealthText = Camera.GetComponentsInChildren<Text>()[0];
         LivesText = Camera.GetComponentsInChildren<Text>()[1];
@@ -58,6 +61,8 @@ public class PlayerController : MonoBehaviour
 
         var emission = rocketTrail.emission;
         emission.rateOverTimeMultiplier = throttle * emissionRate;
+
+        rocketSound.volume = throttle;
 
 
         float fire = Input.GetAxis($"Player {PlayerNumber} Fire");
@@ -103,7 +108,6 @@ public class PlayerController : MonoBehaviour
 
     private void Die()
     {
-        print($"Player {PlayerNumber} died");
         Instantiate(DeathEffect, transform.position, new Quaternion());
         TimeOfDeath = Time.time;
         Lives -= 1;

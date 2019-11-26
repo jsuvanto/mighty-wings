@@ -12,13 +12,15 @@ public class Cannon : Weapon
 
     public int AmmunitionPoolSize;
     private GameObjectPool ammoPool;
-    private ParticleSystem fireEffect;
+    private ParticleSystem fireVfx;
+    private AudioSource fireSfx;
 
     private void Start()
     {
         ammoPool = GameObjectPool.SharedInstance;
-        fireEffect = GetComponent<ParticleSystem>();
-        var m = fireEffect.main;
+        fireVfx = GetComponent<ParticleSystem>();
+        fireSfx = GetComponent<AudioSource>();
+        var m = fireVfx.main;
         m.playOnAwake = false;
     }
 
@@ -39,7 +41,8 @@ public class Cannon : Weapon
                 bullet.GetComponent<Rigidbody2D>().velocity = gameObject.transform.parent.GetComponent<Rigidbody2D>().velocity;
                 bullet.GetComponent<Rigidbody2D>().AddForce(direction * Force);
                 Recoil();
-                fireEffect.Play();
+                fireVfx.Play();
+                if (!fireSfx.isPlaying) fireSfx.Play();
             }            
         }
     }

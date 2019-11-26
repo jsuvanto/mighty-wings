@@ -11,6 +11,8 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
     public float MinimumPenetrationImpulse;
 
     public GameObject PenetrationEffect;
+    public AudioSource RicochetAudio;
+    public GameObject WallHitEffect;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -29,13 +31,16 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
             }
             else
             {                
-                // TODO: sfx
+                if (!RicochetAudio.isPlaying && gameObject.activeInHierarchy)
+                {
+                    RicochetAudio.Play();
+                }
             }
         }
         else if (collision.gameObject.tag == "Cave")
-        {            
+        {
+            Instantiate(WallHitEffect, transform.position, new Quaternion());
             gameObject.SetActive(false);
-            // TODO: sfx
         }
     }
 }
