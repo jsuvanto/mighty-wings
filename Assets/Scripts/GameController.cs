@@ -166,6 +166,7 @@ public class GameController : MonoBehaviour
     public void ResetGame()
     {
         Time.timeScale = 0;
+        isRunning = false;
         MainCamera.gameObject.SetActive(true);
 
         foreach (var player in players)
@@ -176,6 +177,5 @@ public class GameController : MonoBehaviour
             // TODO: remove ammo pools
         }
         players.Clear();
-        
     }
 }
