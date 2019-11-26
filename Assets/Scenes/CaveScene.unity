@@ -1383,7 +1383,7 @@ Camera:
   far clip plane: 1000
   field of view: 89
   orthographic: 1
-  orthographic size: 36
+  orthographic size: 34
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -3684,7 +3684,7 @@ MonoBehaviour:
   Width: 128
   Height: 72
   RandomFillPercentage: 53
-  BorderThickness: 6
+  BorderThickness: 10
   SmoothingCount: 5
   Seed: jsuv
   UseRandomSeed: 1
