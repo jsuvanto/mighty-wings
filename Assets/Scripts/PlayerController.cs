@@ -131,20 +131,25 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        var impulse = collision.GetContact(0).normalImpulse;
+
         if (collision.gameObject.CompareTag("Cave"))
         {
-            var impulse = collision.GetContact(0).normalImpulse;
-            print("wall collision: " + impulse);
-
             if (impulse >= 10)
             {
                 Damage((int) impulse-10);
+                // TODO: sfx
             }
 
         }
         else if (collision.gameObject.CompareTag("Player"))
-        {            
-            print("player collision: " + collision.GetContact(0).normalImpulse);
+        {
+            if (impulse >= 10)
+            {
+                Damage((int)impulse - 10);
+                // TODO: sfx but somehow only one!
+            }
+
         }
 
     }
