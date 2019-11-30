@@ -18,8 +18,6 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            print(collision.contactCount);
-
             var contact = collision.GetContact(0);
             var impulse = contact.normalImpulse; // TODO: replace with average, min, max or other characteristic value for impulse
 

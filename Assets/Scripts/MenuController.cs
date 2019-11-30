@@ -63,7 +63,6 @@ public class MenuController : MonoBehaviour
 
     public void ReturnToStartMenu()
     {
-        print("haloo");
         PauseMenu.gameObject.SetActive(false);
         VictoryMenu.gameObject.SetActive(false);
         StartMenu.gameObject.SetActive(true);
