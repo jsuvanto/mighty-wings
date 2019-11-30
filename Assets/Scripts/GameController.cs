@@ -15,7 +15,7 @@ public class GameController : MonoBehaviour
     public Canvas PlayerHud;
     public Camera PlayerCamera;
     
-    public uint PlayerHealth;
+    public int PlayerHealth;
     public uint PlayerLives;
 
     [Tooltip("Respawn time after death in seconds")]
@@ -77,7 +77,7 @@ public class GameController : MonoBehaviour
             foreach (var player in players)
             {
                 player.LivesText.text = player.Lives.ToString();
-                player.HealthText.text = player.Health.ToString();
+                player.HealthText.text = Math.Max(0, player.Health).ToString();
 
                 if (player.Lives == 0) continue;
 

@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public uint PlayerNumber;
     [HideInInspector]
-    public uint Health;
+    public int Health;
     [HideInInspector]
     public uint Lives;
     [HideInInspector]
@@ -115,17 +115,37 @@ public class PlayerController : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Damage(uint amount)
+    public void Damage(int amount)
     {
         Health -= amount;
     }
 
-    public void Respawn(Vector3 location, uint health)
+    public void Respawn(Vector3 location, int health)
     {
         Health = health;
         transform.position = location;
         transform.rotation = new Quaternion();
         gameObject.SetActive(true);
         rocketTrail.Play();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Cave"))
+        {
+            var impulse = collision.GetContact(0).normalImpulse;
+            print("wall collision: " + impulse);
+
+            if (impulse >= 10)
+            {
+                Damage((int) impulse-10);
+            }
+
+        }
+        else if (collision.gameObject.CompareTag("Player"))
+        {            
+            print("player collision: " + collision.GetContact(0).normalImpulse);
+        }
+
     }
 }

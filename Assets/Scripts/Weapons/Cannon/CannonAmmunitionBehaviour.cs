@@ -5,7 +5,7 @@ using UnityEngine;
 public class CannonAmmunitionBehaviour : MonoBehaviour
 {
     [Tooltip("Damage dealt to a player ship per round of ammunition")]
-    public uint Damage;
+    public int Damage;
 
     [Tooltip("Minimum impulse required to penetrate a player ship")]
     public float MinimumPenetrationImpulse;
@@ -16,8 +16,10 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.CompareTag("Player"))
         {
+            print(collision.contactCount);
+
             var contact = collision.GetContact(0);
             var impulse = contact.normalImpulse; // TODO: replace with average, min, max or other characteristic value for impulse
 
@@ -37,7 +39,7 @@ public class CannonAmmunitionBehaviour : MonoBehaviour
                 }
             }
         }
-        else if (collision.gameObject.tag == "Cave")
+        else if (collision.gameObject.CompareTag("Cave"))
         {
             Instantiate(WallHitEffect, transform.position, new Quaternion());
             gameObject.SetActive(false);
