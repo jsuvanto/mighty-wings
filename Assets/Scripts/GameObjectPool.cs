@@ -20,7 +20,7 @@ public class GameObjectPool: MonoBehaviour
         pool = new List<GameObject>(PoolSize);
         for (int i = 0; i < PoolSize; i++)
         {
-            GameObject obj = Instantiate(GameObject);
+            GameObject obj = Instantiate(GameObject, transform);
             obj.SetActive(false);
             pool.Add(obj);
         }
