@@ -28,9 +28,12 @@ public class MapGenerator : MonoBehaviour
     
     public bool DrawGizmos = true;
 
+    private System.Random spawnRng;
+
     private void Start()
     {
         GenerateCave();
+        spawnRng = new System.Random();
     }
 
     public void GenerateCave()
@@ -91,11 +94,7 @@ public class MapGenerator : MonoBehaviour
     public Vector3 RandomSpawnLocation()
     {
         var possibleSpawnLocations = cave.GetRegions(CaveTile.Air)[0].Tiles;
-
-        var random = new System.Random();
-
-        var randomTile = possibleSpawnLocations[random.Next(0, possibleSpawnLocations.Count)];
-
+        var randomTile = possibleSpawnLocations[spawnRng.Next(0, possibleSpawnLocations.Count)];
         return new Vector3(-Width / 2 + .5f + randomTile.X, -Height / 2 + .5f + randomTile.Y, 1);
     }
 }
