@@ -95,7 +95,7 @@ public class MapGenerator : MonoBehaviour
     {
         var possibleSpawnLocations = cave.GetRegions(CaveTile.Air)[0].Tiles;
         var randomTile = possibleSpawnLocations[spawnRng.Next(0, possibleSpawnLocations.Count)];
-        return new Vector3(-Width / 2 + .5f + randomTile.X, -Height / 2 + .5f + randomTile.Y, 1);
+        return new Vector3(-Width / 2 + .5f + randomTile.X, -Height / 2 + .5f + randomTile.Y, 0);
     }
 }
 

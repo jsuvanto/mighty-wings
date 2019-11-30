@@ -24,11 +24,8 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public Canvas Hud;
 
-
     private Rigidbody2D body;
-    private Vector3 cameraOffset;
-    private ParticleSystem rocketTrail;
-    private float emissionRate;
+    private Vector3 cameraOffset;    
 
     [HideInInspector]
     public Text HealthText;
@@ -38,11 +35,16 @@ public class PlayerController : MonoBehaviour
     public float TimeOfDeath;
 
     private AudioSource rocketSound;
-    
+
+    private ParticleSystem rocketTrail;
+    private float emissionRate;
+
+
     void Start()
     {
         body = GetComponent<Rigidbody2D>();
         cameraOffset = transform.position - Camera.transform.position;
+
         rocketTrail = GetComponent<ParticleSystem>();
         emissionRate = rocketTrail.emission.rateOverTimeMultiplier;
         rocketSound = GetComponent<AudioSource>();
@@ -63,7 +65,6 @@ public class PlayerController : MonoBehaviour
         emission.rateOverTimeMultiplier = throttle * emissionRate;
 
         rocketSound.volume = throttle;
-
 
         float fire = Input.GetAxis($"Player {PlayerNumber} Fire");
         if (fire > 0)
@@ -117,5 +118,14 @@ public class PlayerController : MonoBehaviour
     public void Damage(uint amount)
     {
         Health -= amount;
+    }
+
+    public void Respawn(Vector3 location, uint health)
+    {
+        Health = health;
+        transform.position = location;
+        transform.rotation = new Quaternion();
+        gameObject.SetActive(true);
+        rocketTrail.Play();
     }
 }

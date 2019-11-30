@@ -44,20 +44,21 @@ public class GameController : MonoBehaviour
         for (uint playerNumber = 1; playerNumber <= NumberOfPlayers; playerNumber++)
         {
             var playerShip = CreatePlayerShip(playerNumber);
-            var playerController = playerShip.GetComponent<PlayerController>();
+            var player = playerShip.GetComponent<PlayerController>();
             
             var playerCamera = CreatePlayerCamera(playerNumber);
             playerCamera.transform.position = playerShip.transform.position - new Vector3(0, 0, 10);
             playerShip.GetComponent<PlayerController>().Camera = playerCamera;
-            var playerHud = CreatePlayerHud(playerCamera, playerNumber);
-            playerHud.transform.SetParent(playerCamera.transform);
+            player.Camera = playerCamera;
 
-            playerController.Camera = playerCamera;
-            playerController.Hud = playerHud;
-            playerController.Health = PlayerHealth;
-            playerController.Lives = PlayerLives;
+            var playerHud = CreatePlayerHud(playerCamera, playerNumber);
+            playerHud.transform.SetParent(playerCamera.transform);            
+            player.Hud = playerHud;
+
+            player.Health = PlayerHealth;
+            player.Lives = PlayerLives;
             
-            players.Add(playerController);
+            players.Add(player);
         }
         isPaused = false;
         isRunning = true;
@@ -82,9 +83,7 @@ public class GameController : MonoBehaviour
 
                 if (!player.isActiveAndEnabled && player.TimeOfDeath + RespawnTime < Time.time)
                 {
-                    player.gameObject.transform.position = RandomSpawnLocation();
-                    player.Health = PlayerHealth;
-                    player.gameObject.SetActive(true);
+                    player.Respawn(RandomSpawnLocation(), PlayerHealth);                    
                 }
 
                 // TODO: update score
