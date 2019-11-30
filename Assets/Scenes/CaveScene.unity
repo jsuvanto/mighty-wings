@@ -4001,7 +4001,7 @@ MonoBehaviour:
   Width: 128
   Height: 72
   RandomFillPercentage: 47
-  BorderThickness: 10
+  BorderThickness: 6
   SmoothingCount: 5
   Seed: jsuv
   UseRandomSeed: 1
