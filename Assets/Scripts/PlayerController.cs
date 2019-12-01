@@ -39,6 +39,9 @@ public class PlayerController : MonoBehaviour
     private ParticleSystem rocketTrail;
     private float emissionRate;
 
+    public AudioSource WallCollision;
+    public AudioSource ShipCollision;
+
 
     void Start()
     {
@@ -138,7 +141,7 @@ public class PlayerController : MonoBehaviour
             if (impulse >= 10)
             {
                 Damage((int) impulse-10);
-                // TODO: sfx
+                WallCollision.Play();
             }
 
         }
@@ -147,7 +150,8 @@ public class PlayerController : MonoBehaviour
             if (impulse >= 10)
             {
                 Damage((int)impulse - 10);
-                // TODO: sfx but somehow only one!
+                // the sfx is actually played by both ships but it shouldn't matter much
+                ShipCollision.Play();
             }
 
         }
